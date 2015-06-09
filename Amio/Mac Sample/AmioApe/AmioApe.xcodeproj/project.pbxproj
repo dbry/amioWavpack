@@ -1,0 +1,625 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
+		CC1C72BE133C468A00B10497 /* AmioApe.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8D5B49B6048680CD000E48DA /* AmioApe.bundle */; };
+		CC1C734B133D040500B10497 /* AmioPrivateSettingsSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7343133D040500B10497 /* AmioPrivateSettingsSerializer.cpp */; };
+		CC1C734C133D040500B10497 /* AmioSDK.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7345133D040500B10497 /* AmioSDK.cpp */; };
+		CC1C734D133D040500B10497 /* AmioUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7348133D040500B10497 /* AmioUtilities.cpp */; };
+		CC1C747D133D42DC00B10497 /* APECompress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7458133D42DC00B10497 /* APECompress.cpp */; };
+		CC1C747E133D42DC00B10497 /* APECompressCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C745A133D42DC00B10497 /* APECompressCore.cpp */; };
+		CC1C747F133D42DC00B10497 /* APECompressCreate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C745C133D42DC00B10497 /* APECompressCreate.cpp */; };
+		CC1C7480133D42DC00B10497 /* APEDecompress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C745E133D42DC00B10497 /* APEDecompress.cpp */; };
+		CC1C7481133D42DC00B10497 /* APEHeader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7460133D42DC00B10497 /* APEHeader.cpp */; };
+		CC1C7482133D42DC00B10497 /* APEInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7462133D42DC00B10497 /* APEInfo.cpp */; };
+		CC1C7483133D42DC00B10497 /* APELink.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7464133D42DC00B10497 /* APELink.cpp */; };
+		CC1C7484133D42DC00B10497 /* APETag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7466133D42DC00B10497 /* APETag.cpp */; };
+		CC1C7485133D42DC00B10497 /* BitArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7468133D42DC00B10497 /* BitArray.cpp */; };
+		CC1C7486133D42DC00B10497 /* CharacterHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C746A133D42DC00B10497 /* CharacterHelper.cpp */; };
+		CC1C7487133D42DC00B10497 /* CircleBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C746C133D42DC00B10497 /* CircleBuffer.cpp */; };
+		CC1C7488133D42DC00B10497 /* MACLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C746E133D42DC00B10497 /* MACLib.cpp */; };
+		CC1C7489133D42DC00B10497 /* md5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C746F133D42DC00B10497 /* md5.cpp */; };
+		CC1C748A133D42DC00B10497 /* NewPredictor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7471133D42DC00B10497 /* NewPredictor.cpp */; };
+		CC1C748B133D42DC00B10497 /* NNFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7473133D42DC00B10497 /* NNFilter.cpp */; };
+		CC1C748C133D42DC00B10497 /* Prepare.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7475133D42DC00B10497 /* Prepare.cpp */; };
+		CC1C748D133D42DC00B10497 /* StdLibFileIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7477133D42DC00B10497 /* StdLibFileIO.cpp */; };
+		CC1C748E133D42DC00B10497 /* UnBitArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7479133D42DC00B10497 /* UnBitArray.cpp */; };
+		CC1C748F133D42DC00B10497 /* UnBitArrayBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C747B133D42DC00B10497 /* UnBitArrayBase.cpp */; };
+		CC1C75D41342858A00B10497 /* AmioApeSettingsDialogMac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C75D31342858A00B10497 /* AmioApeSettingsDialogMac.cpp */; };
+		CC3541CF13798EE900B51CCC /* SettingsDialogController.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC3541CE13798EE900B51CCC /* SettingsDialogController.mm */; };
+		CC556C961382C44600668221 /* AmioApeInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC556C8D1382C44600668221 /* AmioApeInterface.cpp */; };
+		CC556C971382C44600668221 /* AmioApePrivateSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC556C8E1382C44600668221 /* AmioApePrivateSettings.cpp */; };
+		CC556C981382C44600668221 /* ApeReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC556C911382C44600668221 /* ApeReader.cpp */; };
+		CC556C991382C44600668221 /* ApeWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC556C941382C44600668221 /* ApeWriter.cpp */; };
+		CC556C9A1382C44600668221 /* AmioApeInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC556C8D1382C44600668221 /* AmioApeInterface.cpp */; };
+		CC556C9B1382C44600668221 /* AmioApePrivateSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC556C8E1382C44600668221 /* AmioApePrivateSettings.cpp */; };
+		CC556C9C1382C44600668221 /* ApeReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC556C911382C44600668221 /* ApeReader.cpp */; };
+		CC556C9D1382C44600668221 /* ApeWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC556C941382C44600668221 /* ApeWriter.cpp */; };
+		CCDD5C1D137EE77600DBC5BA /* SettingsDialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCDE2DFA1379A5860086214E /* SettingsDialog.xib */; };
+		CCDD5C20137EE77600DBC5BA /* AmioPrivateSettingsSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7343133D040500B10497 /* AmioPrivateSettingsSerializer.cpp */; };
+		CCDD5C21137EE77600DBC5BA /* AmioSDK.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7345133D040500B10497 /* AmioSDK.cpp */; };
+		CCDD5C22137EE77600DBC5BA /* AmioUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7348133D040500B10497 /* AmioUtilities.cpp */; };
+		CCDD5C26137EE77600DBC5BA /* APECompress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7458133D42DC00B10497 /* APECompress.cpp */; };
+		CCDD5C27137EE77600DBC5BA /* APECompressCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C745A133D42DC00B10497 /* APECompressCore.cpp */; };
+		CCDD5C28137EE77600DBC5BA /* APECompressCreate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C745C133D42DC00B10497 /* APECompressCreate.cpp */; };
+		CCDD5C29137EE77600DBC5BA /* APEDecompress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C745E133D42DC00B10497 /* APEDecompress.cpp */; };
+		CCDD5C2A137EE77600DBC5BA /* APEHeader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7460133D42DC00B10497 /* APEHeader.cpp */; };
+		CCDD5C2B137EE77600DBC5BA /* APEInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7462133D42DC00B10497 /* APEInfo.cpp */; };
+		CCDD5C2C137EE77600DBC5BA /* APELink.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7464133D42DC00B10497 /* APELink.cpp */; };
+		CCDD5C2D137EE77600DBC5BA /* APETag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7466133D42DC00B10497 /* APETag.cpp */; };
+		CCDD5C2E137EE77600DBC5BA /* BitArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7468133D42DC00B10497 /* BitArray.cpp */; };
+		CCDD5C2F137EE77600DBC5BA /* CharacterHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C746A133D42DC00B10497 /* CharacterHelper.cpp */; };
+		CCDD5C30137EE77600DBC5BA /* CircleBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C746C133D42DC00B10497 /* CircleBuffer.cpp */; };
+		CCDD5C31137EE77600DBC5BA /* MACLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C746E133D42DC00B10497 /* MACLib.cpp */; };
+		CCDD5C32137EE77600DBC5BA /* md5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C746F133D42DC00B10497 /* md5.cpp */; };
+		CCDD5C33137EE77600DBC5BA /* NewPredictor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7471133D42DC00B10497 /* NewPredictor.cpp */; };
+		CCDD5C34137EE77600DBC5BA /* NNFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7473133D42DC00B10497 /* NNFilter.cpp */; };
+		CCDD5C35137EE77600DBC5BA /* Prepare.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7475133D42DC00B10497 /* Prepare.cpp */; };
+		CCDD5C36137EE77600DBC5BA /* StdLibFileIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7477133D42DC00B10497 /* StdLibFileIO.cpp */; };
+		CCDD5C37137EE77600DBC5BA /* UnBitArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C7479133D42DC00B10497 /* UnBitArray.cpp */; };
+		CCDD5C38137EE77600DBC5BA /* UnBitArrayBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C747B133D42DC00B10497 /* UnBitArrayBase.cpp */; };
+		CCDD5C39137EE77600DBC5BA /* AmioApeSettingsDialogMac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C75D31342858A00B10497 /* AmioApeSettingsDialogMac.cpp */; };
+		CCDD5C3A137EE77600DBC5BA /* SettingsDialogController.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC3541CE13798EE900B51CCC /* SettingsDialogController.mm */; };
+		CCDD5C3C137EE77600DBC5BA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
+		CCDD5C3E137EE77600DBC5BA /* AmioApe.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8D5B49B6048680CD000E48DA /* AmioApe.bundle */; };
+		CCDE2DFB1379A5860086214E /* SettingsDialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCDE2DFA1379A5860086214E /* SettingsDialog.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		CC1C72BB133C44FE00B10497 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "/Applications/Adobe Audition CS5.5/Adobe Audition.app/Contents/Amio Plug-Ins";
+			dstSubfolderSpec = 0;
+			files = (
+				CC1C72BE133C468A00B10497 /* AmioApe.bundle in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CCDD5C3D137EE77600DBC5BA /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "/Applications/Adobe Audition CS5.5/Adobe Audition.app/Contents/Amio Plug-Ins";
+			dstSubfolderSpec = 0;
+			files = (
+				CCDD5C3E137EE77600DBC5BA /* AmioApe.bundle in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		8D5B49B6048680CD000E48DA /* AmioApe.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AmioApe.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CC139AAC1383044D00B3F9AE /* ID3Genres.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ID3Genres.h; path = "../../Common/Monkeys Audio Modified Source/ID3Genres.h"; sourceTree = SOURCE_ROOT; };
+		CC139AAD1383044D00B3F9AE /* IO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IO.h; path = "../../Common/Monkeys Audio Modified Source/IO.h"; sourceTree = SOURCE_ROOT; };
+		CC139AAE1383044D00B3F9AE /* Predictor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Predictor.h; path = "../../Common/Monkeys Audio Modified Source/Predictor.h"; sourceTree = SOURCE_ROOT; };
+		CC139AAF1383044D00B3F9AE /* RollBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RollBuffer.h; path = "../../Common/Monkeys Audio Modified Source/RollBuffer.h"; sourceTree = SOURCE_ROOT; };
+		CC139AB01383044D00B3F9AE /* ScaledFirstOrderFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScaledFirstOrderFilter.h; path = "../../Common/Monkeys Audio Modified Source/ScaledFirstOrderFilter.h"; sourceTree = SOURCE_ROOT; };
+		CC139AB11383044D00B3F9AE /* SmartPtr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SmartPtr.h; path = "../../Common/Monkeys Audio Modified Source/SmartPtr.h"; sourceTree = SOURCE_ROOT; };
+		CC1C7339133D009F00B10497 /* AmioSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AmioSDK.h; path = ../../AmioSDK/AmioSDK.h; sourceTree = SOURCE_ROOT; };
+		CC1C7340133D040500B10497 /* AmioInterfaceTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AmioInterfaceTemplate.h; path = ../../AmioSDK/AmioInterfaceTemplate.h; sourceTree = "<group>"; };
+		CC1C7342133D040500B10497 /* AmioModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmioModule.h; sourceTree = "<group>"; };
+		CC1C7343133D040500B10497 /* AmioPrivateSettingsSerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AmioPrivateSettingsSerializer.cpp; path = ../../AmioSDK/AmioPrivateSettingsSerializer.cpp; sourceTree = "<group>"; };
+		CC1C7344133D040500B10497 /* AmioPrivateSettingsSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AmioPrivateSettingsSerializer.h; path = ../../AmioSDK/AmioPrivateSettingsSerializer.h; sourceTree = "<group>"; };
+		CC1C7345133D040500B10497 /* AmioSDK.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AmioSDK.cpp; path = ../../AmioSDK/AmioSDK.cpp; sourceTree = "<group>"; };
+		CC1C7346133D040500B10497 /* AmioSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmioSDK.h; sourceTree = "<group>"; };
+		CC1C7347133D040500B10497 /* AmioSDKTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AmioSDKTypes.h; path = ../../AmioSDK/AmioSDKTypes.h; sourceTree = "<group>"; };
+		CC1C7348133D040500B10497 /* AmioUtilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AmioUtilities.cpp; sourceTree = "<group>"; };
+		CC1C7349133D040500B10497 /* AmioUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmioUtilities.h; sourceTree = "<group>"; };
+		CC1C73E5133D3C3100B10497 /* All.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = All.h; path = "../../Common/Monkeys Audio Modified Source/All.h"; sourceTree = SOURCE_ROOT; };
+		CC1C73E6133D3C3100B10497 /* MACLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MACLib.h; path = "../../Common/Monkeys Audio Modified Source/MACLib.h"; sourceTree = SOURCE_ROOT; };
+		CC1C7458133D42DC00B10497 /* APECompress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = APECompress.cpp; path = "../../Common/Monkeys Audio Modified Source/APECompress.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C7459133D42DC00B10497 /* APECompress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APECompress.h; path = "../../Common/Monkeys Audio Modified Source/APECompress.h"; sourceTree = SOURCE_ROOT; };
+		CC1C745A133D42DC00B10497 /* APECompressCore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = APECompressCore.cpp; path = "../../Common/Monkeys Audio Modified Source/APECompressCore.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C745B133D42DC00B10497 /* APECompressCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APECompressCore.h; path = "../../Common/Monkeys Audio Modified Source/APECompressCore.h"; sourceTree = SOURCE_ROOT; };
+		CC1C745C133D42DC00B10497 /* APECompressCreate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = APECompressCreate.cpp; path = "../../Common/Monkeys Audio Modified Source/APECompressCreate.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C745D133D42DC00B10497 /* APECompressCreate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APECompressCreate.h; path = "../../Common/Monkeys Audio Modified Source/APECompressCreate.h"; sourceTree = SOURCE_ROOT; };
+		CC1C745E133D42DC00B10497 /* APEDecompress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = APEDecompress.cpp; path = "../../Common/Monkeys Audio Modified Source/APEDecompress.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C745F133D42DC00B10497 /* APEDecompress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APEDecompress.h; path = "../../Common/Monkeys Audio Modified Source/APEDecompress.h"; sourceTree = SOURCE_ROOT; };
+		CC1C7460133D42DC00B10497 /* APEHeader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = APEHeader.cpp; path = "../../Common/Monkeys Audio Modified Source/APEHeader.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C7461133D42DC00B10497 /* APEHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APEHeader.h; path = "../../Common/Monkeys Audio Modified Source/APEHeader.h"; sourceTree = SOURCE_ROOT; };
+		CC1C7462133D42DC00B10497 /* APEInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = APEInfo.cpp; path = "../../Common/Monkeys Audio Modified Source/APEInfo.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C7463133D42DC00B10497 /* APEInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APEInfo.h; path = "../../Common/Monkeys Audio Modified Source/APEInfo.h"; sourceTree = SOURCE_ROOT; };
+		CC1C7464133D42DC00B10497 /* APELink.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = APELink.cpp; path = "../../Common/Monkeys Audio Modified Source/APELink.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C7465133D42DC00B10497 /* APELink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APELink.h; path = "../../Common/Monkeys Audio Modified Source/APELink.h"; sourceTree = SOURCE_ROOT; };
+		CC1C7466133D42DC00B10497 /* APETag.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = APETag.cpp; path = "../../Common/Monkeys Audio Modified Source/APETag.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C7467133D42DC00B10497 /* APETag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APETag.h; path = "../../Common/Monkeys Audio Modified Source/APETag.h"; sourceTree = SOURCE_ROOT; };
+		CC1C7468133D42DC00B10497 /* BitArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BitArray.cpp; path = "../../Common/Monkeys Audio Modified Source/BitArray.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C7469133D42DC00B10497 /* BitArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BitArray.h; path = "../../Common/Monkeys Audio Modified Source/BitArray.h"; sourceTree = SOURCE_ROOT; };
+		CC1C746A133D42DC00B10497 /* CharacterHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CharacterHelper.cpp; path = "../../Common/Monkeys Audio Modified Source/CharacterHelper.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C746B133D42DC00B10497 /* CharacterHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CharacterHelper.h; path = "../../Common/Monkeys Audio Modified Source/CharacterHelper.h"; sourceTree = SOURCE_ROOT; };
+		CC1C746C133D42DC00B10497 /* CircleBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CircleBuffer.cpp; path = "../../Common/Monkeys Audio Modified Source/CircleBuffer.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C746D133D42DC00B10497 /* CircleBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CircleBuffer.h; path = "../../Common/Monkeys Audio Modified Source/CircleBuffer.h"; sourceTree = SOURCE_ROOT; };
+		CC1C746E133D42DC00B10497 /* MACLib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MACLib.cpp; path = "../../Common/Monkeys Audio Modified Source/MACLib.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C746F133D42DC00B10497 /* md5.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = md5.cpp; path = "../../Common/Monkeys Audio Modified Source/md5.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C7470133D42DC00B10497 /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = md5.h; path = "../../Common/Monkeys Audio Modified Source/md5.h"; sourceTree = SOURCE_ROOT; };
+		CC1C7471133D42DC00B10497 /* NewPredictor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NewPredictor.cpp; path = "../../Common/Monkeys Audio Modified Source/NewPredictor.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C7472133D42DC00B10497 /* NewPredictor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NewPredictor.h; path = "../../Common/Monkeys Audio Modified Source/NewPredictor.h"; sourceTree = SOURCE_ROOT; };
+		CC1C7473133D42DC00B10497 /* NNFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NNFilter.cpp; path = "../../Common/Monkeys Audio Modified Source/NNFilter.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C7474133D42DC00B10497 /* NNFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NNFilter.h; path = "../../Common/Monkeys Audio Modified Source/NNFilter.h"; sourceTree = SOURCE_ROOT; };
+		CC1C7475133D42DC00B10497 /* Prepare.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Prepare.cpp; path = "../../Common/Monkeys Audio Modified Source/Prepare.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C7476133D42DC00B10497 /* Prepare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Prepare.h; path = "../../Common/Monkeys Audio Modified Source/Prepare.h"; sourceTree = SOURCE_ROOT; };
+		CC1C7477133D42DC00B10497 /* StdLibFileIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StdLibFileIO.cpp; path = "../../Common/Monkeys Audio Modified Source/StdLibFileIO.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C7478133D42DC00B10497 /* StdLibFileIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StdLibFileIO.h; path = "../../Common/Monkeys Audio Modified Source/StdLibFileIO.h"; sourceTree = SOURCE_ROOT; };
+		CC1C7479133D42DC00B10497 /* UnBitArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UnBitArray.cpp; path = "../../Common/Monkeys Audio Modified Source/UnBitArray.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C747A133D42DC00B10497 /* UnBitArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnBitArray.h; path = "../../Common/Monkeys Audio Modified Source/UnBitArray.h"; sourceTree = SOURCE_ROOT; };
+		CC1C747B133D42DC00B10497 /* UnBitArrayBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UnBitArrayBase.cpp; path = "../../Common/Monkeys Audio Modified Source/UnBitArrayBase.cpp"; sourceTree = SOURCE_ROOT; };
+		CC1C747C133D42DC00B10497 /* UnBitArrayBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnBitArrayBase.h; path = "../../Common/Monkeys Audio Modified Source/UnBitArrayBase.h"; sourceTree = SOURCE_ROOT; };
+		CC1C75D31342858A00B10497 /* AmioApeSettingsDialogMac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AmioApeSettingsDialogMac.cpp; sourceTree = "<group>"; };
+		CC3541CD13798EE900B51CCC /* SettingsDialogController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsDialogController.h; sourceTree = "<group>"; };
+		CC3541CE13798EE900B51CCC /* SettingsDialogController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SettingsDialogController.mm; sourceTree = "<group>"; };
+		CC556C8D1382C44600668221 /* AmioApeInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AmioApeInterface.cpp; path = ../../Common/AmioApe/AmioApeInterface.cpp; sourceTree = SOURCE_ROOT; };
+		CC556C8E1382C44600668221 /* AmioApePrivateSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AmioApePrivateSettings.cpp; path = ../../Common/AmioApe/AmioApePrivateSettings.cpp; sourceTree = SOURCE_ROOT; };
+		CC556C8F1382C44600668221 /* AmioApePrivateSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AmioApePrivateSettings.h; path = ../../Common/AmioApe/AmioApePrivateSettings.h; sourceTree = SOURCE_ROOT; };
+		CC556C901382C44600668221 /* AmioApeSettingsDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AmioApeSettingsDialog.h; path = ../../Common/AmioApe/AmioApeSettingsDialog.h; sourceTree = SOURCE_ROOT; };
+		CC556C911382C44600668221 /* ApeReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ApeReader.cpp; path = ../../Common/AmioApe/ApeReader.cpp; sourceTree = SOURCE_ROOT; };
+		CC556C921382C44600668221 /* ApeReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ApeReader.h; path = ../../Common/AmioApe/ApeReader.h; sourceTree = SOURCE_ROOT; };
+		CC556C931382C44600668221 /* ApeTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ApeTypes.h; path = ../../Common/AmioApe/ApeTypes.h; sourceTree = SOURCE_ROOT; };
+		CC556C941382C44600668221 /* ApeWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ApeWriter.cpp; path = ../../Common/AmioApe/ApeWriter.cpp; sourceTree = SOURCE_ROOT; };
+		CC556C951382C44600668221 /* ApeWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ApeWriter.h; path = ../../Common/AmioApe/ApeWriter.h; sourceTree = SOURCE_ROOT; };
+		CC9E41771382C8490036888B /* ASDKTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASDKTypes.h; path = ../../../ASDKTypes.h; sourceTree = SOURCE_ROOT; };
+		CC9E417B1382C9560036888B /* NoWindows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NoWindows.h; path = "../../Common/Monkeys Audio Modified Source/NoWindows.h"; sourceTree = SOURCE_ROOT; };
+		CCDD5C42137EE77600DBC5BA /* AmioApe.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AmioApe.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		CCDE2DFA1379A5860086214E /* SettingsDialog.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsDialog.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D5B49B3048680CD000E48DA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CCDD5C3B137EE77600DBC5BA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CCDD5C3C137EE77600DBC5BA /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		089C166AFE841209C02AAC07 /* AmioApe */ = {
+			isa = PBXGroup;
+			children = (
+				CC1C7335133CFFFE00B10497 /* Sources */,
+				08FB77AFFE84173DC02AAC07 /* Classes */,
+				32C88E010371C26100C91783 /* Other Sources */,
+				089C167CFE841241C02AAC07 /* Resources */,
+				089C1671FE841209C02AAC07 /* Frameworks and Libraries */,
+				19C28FB8FE9D52D311CA2CBB /* Products */,
+			);
+			name = AmioApe;
+			sourceTree = "<group>";
+		};
+		089C1671FE841209C02AAC07 /* Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */,
+				1058C7AEFEA557BF11CA2CBB /* Other Frameworks */,
+			);
+			name = "Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		089C167CFE841241C02AAC07 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CCDE2DFA1379A5860086214E /* SettingsDialog.xib */,
+				8D5B49B7048680CD000E48DA /* Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		08FB77AFFE84173DC02AAC07 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7AEFEA557BF11CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FB8FE9D52D311CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D5B49B6048680CD000E48DA /* AmioApe.bundle */,
+				CCDD5C42137EE77600DBC5BA /* AmioApe.bundle */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		32C88E010371C26100C91783 /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				CC1C733F133D040500B10497 /* AmioSDK */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		CC1C7335133CFFFE00B10497 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				CC9E41771382C8490036888B /* ASDKTypes.h */,
+				CC556C8D1382C44600668221 /* AmioApeInterface.cpp */,
+				CC556C8E1382C44600668221 /* AmioApePrivateSettings.cpp */,
+				CC556C8F1382C44600668221 /* AmioApePrivateSettings.h */,
+				CC556C901382C44600668221 /* AmioApeSettingsDialog.h */,
+				CC1C75D31342858A00B10497 /* AmioApeSettingsDialogMac.cpp */,
+				CC556C911382C44600668221 /* ApeReader.cpp */,
+				CC556C921382C44600668221 /* ApeReader.h */,
+				CC556C931382C44600668221 /* ApeTypes.h */,
+				CC556C941382C44600668221 /* ApeWriter.cpp */,
+				CC556C951382C44600668221 /* ApeWriter.h */,
+				CC3541CD13798EE900B51CCC /* SettingsDialogController.h */,
+				CC3541CE13798EE900B51CCC /* SettingsDialogController.mm */,
+				CC1C7338133D001500B10497 /* AmioSDK */,
+				CC1C73E1133D3B6800B10497 /* Monkey's Audio */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		CC1C7338133D001500B10497 /* AmioSDK */ = {
+			isa = PBXGroup;
+			children = (
+				CC1C7343133D040500B10497 /* AmioPrivateSettingsSerializer.cpp */,
+				CC1C7344133D040500B10497 /* AmioPrivateSettingsSerializer.h */,
+				CC1C7345133D040500B10497 /* AmioSDK.cpp */,
+				CC1C7347133D040500B10497 /* AmioSDKTypes.h */,
+				CC1C7340133D040500B10497 /* AmioInterfaceTemplate.h */,
+				CC1C7339133D009F00B10497 /* AmioSDK.h */,
+			);
+			name = AmioSDK;
+			sourceTree = "<group>";
+		};
+		CC1C733F133D040500B10497 /* AmioSDK */ = {
+			isa = PBXGroup;
+			children = (
+				CC1C7342133D040500B10497 /* AmioModule.h */,
+				CC1C7346133D040500B10497 /* AmioSDK.h */,
+				CC1C7348133D040500B10497 /* AmioUtilities.cpp */,
+				CC1C7349133D040500B10497 /* AmioUtilities.h */,
+			);
+			name = AmioSDK;
+			path = ../../AmioSDK;
+			sourceTree = SOURCE_ROOT;
+		};
+		CC1C73E1133D3B6800B10497 /* Monkey's Audio */ = {
+			isa = PBXGroup;
+			children = (
+				CC1C73E5133D3C3100B10497 /* All.h */,
+				CC1C7458133D42DC00B10497 /* APECompress.cpp */,
+				CC1C7459133D42DC00B10497 /* APECompress.h */,
+				CC1C745A133D42DC00B10497 /* APECompressCore.cpp */,
+				CC1C745B133D42DC00B10497 /* APECompressCore.h */,
+				CC1C745C133D42DC00B10497 /* APECompressCreate.cpp */,
+				CC1C745D133D42DC00B10497 /* APECompressCreate.h */,
+				CC1C745E133D42DC00B10497 /* APEDecompress.cpp */,
+				CC1C745F133D42DC00B10497 /* APEDecompress.h */,
+				CC1C7460133D42DC00B10497 /* APEHeader.cpp */,
+				CC1C7461133D42DC00B10497 /* APEHeader.h */,
+				CC1C7462133D42DC00B10497 /* APEInfo.cpp */,
+				CC1C7463133D42DC00B10497 /* APEInfo.h */,
+				CC1C7464133D42DC00B10497 /* APELink.cpp */,
+				CC1C7465133D42DC00B10497 /* APELink.h */,
+				CC1C7466133D42DC00B10497 /* APETag.cpp */,
+				CC1C7467133D42DC00B10497 /* APETag.h */,
+				CC1C7468133D42DC00B10497 /* BitArray.cpp */,
+				CC1C7469133D42DC00B10497 /* BitArray.h */,
+				CC1C746A133D42DC00B10497 /* CharacterHelper.cpp */,
+				CC1C746B133D42DC00B10497 /* CharacterHelper.h */,
+				CC1C746C133D42DC00B10497 /* CircleBuffer.cpp */,
+				CC1C746D133D42DC00B10497 /* CircleBuffer.h */,
+				CC139AAC1383044D00B3F9AE /* ID3Genres.h */,
+				CC139AAD1383044D00B3F9AE /* IO.h */,
+				CC1C746E133D42DC00B10497 /* MACLib.cpp */,
+				CC1C73E6133D3C3100B10497 /* MACLib.h */,
+				CC1C746F133D42DC00B10497 /* md5.cpp */,
+				CC1C7470133D42DC00B10497 /* md5.h */,
+				CC1C7471133D42DC00B10497 /* NewPredictor.cpp */,
+				CC1C7472133D42DC00B10497 /* NewPredictor.h */,
+				CC1C7473133D42DC00B10497 /* NNFilter.cpp */,
+				CC1C7474133D42DC00B10497 /* NNFilter.h */,
+				CC9E417B1382C9560036888B /* NoWindows.h */,
+				CC139AAE1383044D00B3F9AE /* Predictor.h */,
+				CC1C7475133D42DC00B10497 /* Prepare.cpp */,
+				CC1C7476133D42DC00B10497 /* Prepare.h */,
+				CC139AAF1383044D00B3F9AE /* RollBuffer.h */,
+				CC139AB01383044D00B3F9AE /* ScaledFirstOrderFilter.h */,
+				CC139AB11383044D00B3F9AE /* SmartPtr.h */,
+				CC1C7477133D42DC00B10497 /* StdLibFileIO.cpp */,
+				CC1C7478133D42DC00B10497 /* StdLibFileIO.h */,
+				CC1C7479133D42DC00B10497 /* UnBitArray.cpp */,
+				CC1C747A133D42DC00B10497 /* UnBitArray.h */,
+				CC1C747B133D42DC00B10497 /* UnBitArrayBase.cpp */,
+				CC1C747C133D42DC00B10497 /* UnBitArrayBase.h */,
+			);
+			name = "Monkey's Audio";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D5B49AC048680CD000E48DA /* AmioApe.Debug */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB913A08733D840010E9CD /* Build configuration list for PBXNativeTarget "AmioApe.Debug" */;
+			buildPhases = (
+				8D5B49AF048680CD000E48DA /* Resources */,
+				8D5B49B1048680CD000E48DA /* Sources */,
+				8D5B49B3048680CD000E48DA /* Frameworks */,
+				CC1C72BB133C44FE00B10497 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AmioApe.Debug;
+			productInstallPath = "$(HOME)/Library/Bundles";
+			productName = AmioApe;
+			productReference = 8D5B49B6048680CD000E48DA /* AmioApe.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+		CCDD5C1B137EE77600DBC5BA /* AmioApe.Release */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CCDD5C3F137EE77600DBC5BA /* Build configuration list for PBXNativeTarget "AmioApe.Release" */;
+			buildPhases = (
+				CCDD5C1C137EE77600DBC5BA /* Resources */,
+				CCDD5C1E137EE77600DBC5BA /* Sources */,
+				CCDD5C3B137EE77600DBC5BA /* Frameworks */,
+				CCDD5C3D137EE77600DBC5BA /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AmioApe.Release;
+			productInstallPath = "$(HOME)/Library/Bundles";
+			productName = AmioApe;
+			productReference = CCDD5C42137EE77600DBC5BA /* AmioApe.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		089C1669FE841209C02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB913E08733D840010E9CD /* Build configuration list for PBXProject "AmioApe" */;
+			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 089C166AFE841209C02AAC07 /* AmioApe */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D5B49AC048680CD000E48DA /* AmioApe.Debug */,
+				CCDD5C1B137EE77600DBC5BA /* AmioApe.Release */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D5B49AF048680CD000E48DA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CCDE2DFB1379A5860086214E /* SettingsDialog.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CCDD5C1C137EE77600DBC5BA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CCDD5C1D137EE77600DBC5BA /* SettingsDialog.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D5B49B1048680CD000E48DA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC1C734B133D040500B10497 /* AmioPrivateSettingsSerializer.cpp in Sources */,
+				CC1C734C133D040500B10497 /* AmioSDK.cpp in Sources */,
+				CC1C734D133D040500B10497 /* AmioUtilities.cpp in Sources */,
+				CC1C747D133D42DC00B10497 /* APECompress.cpp in Sources */,
+				CC1C747E133D42DC00B10497 /* APECompressCore.cpp in Sources */,
+				CC1C747F133D42DC00B10497 /* APECompressCreate.cpp in Sources */,
+				CC1C7480133D42DC00B10497 /* APEDecompress.cpp in Sources */,
+				CC1C7481133D42DC00B10497 /* APEHeader.cpp in Sources */,
+				CC1C7482133D42DC00B10497 /* APEInfo.cpp in Sources */,
+				CC1C7483133D42DC00B10497 /* APELink.cpp in Sources */,
+				CC1C7484133D42DC00B10497 /* APETag.cpp in Sources */,
+				CC1C7485133D42DC00B10497 /* BitArray.cpp in Sources */,
+				CC1C7486133D42DC00B10497 /* CharacterHelper.cpp in Sources */,
+				CC1C7487133D42DC00B10497 /* CircleBuffer.cpp in Sources */,
+				CC1C7488133D42DC00B10497 /* MACLib.cpp in Sources */,
+				CC1C7489133D42DC00B10497 /* md5.cpp in Sources */,
+				CC1C748A133D42DC00B10497 /* NewPredictor.cpp in Sources */,
+				CC1C748B133D42DC00B10497 /* NNFilter.cpp in Sources */,
+				CC1C748C133D42DC00B10497 /* Prepare.cpp in Sources */,
+				CC1C748D133D42DC00B10497 /* StdLibFileIO.cpp in Sources */,
+				CC1C748E133D42DC00B10497 /* UnBitArray.cpp in Sources */,
+				CC1C748F133D42DC00B10497 /* UnBitArrayBase.cpp in Sources */,
+				CC1C75D41342858A00B10497 /* AmioApeSettingsDialogMac.cpp in Sources */,
+				CC3541CF13798EE900B51CCC /* SettingsDialogController.mm in Sources */,
+				CC556C961382C44600668221 /* AmioApeInterface.cpp in Sources */,
+				CC556C971382C44600668221 /* AmioApePrivateSettings.cpp in Sources */,
+				CC556C981382C44600668221 /* ApeReader.cpp in Sources */,
+				CC556C991382C44600668221 /* ApeWriter.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CCDD5C1E137EE77600DBC5BA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CCDD5C20137EE77600DBC5BA /* AmioPrivateSettingsSerializer.cpp in Sources */,
+				CCDD5C21137EE77600DBC5BA /* AmioSDK.cpp in Sources */,
+				CCDD5C22137EE77600DBC5BA /* AmioUtilities.cpp in Sources */,
+				CCDD5C26137EE77600DBC5BA /* APECompress.cpp in Sources */,
+				CCDD5C27137EE77600DBC5BA /* APECompressCore.cpp in Sources */,
+				CCDD5C28137EE77600DBC5BA /* APECompressCreate.cpp in Sources */,
+				CCDD5C29137EE77600DBC5BA /* APEDecompress.cpp in Sources */,
+				CCDD5C2A137EE77600DBC5BA /* APEHeader.cpp in Sources */,
+				CCDD5C2B137EE77600DBC5BA /* APEInfo.cpp in Sources */,
+				CCDD5C2C137EE77600DBC5BA /* APELink.cpp in Sources */,
+				CCDD5C2D137EE77600DBC5BA /* APETag.cpp in Sources */,
+				CCDD5C2E137EE77600DBC5BA /* BitArray.cpp in Sources */,
+				CCDD5C2F137EE77600DBC5BA /* CharacterHelper.cpp in Sources */,
+				CCDD5C30137EE77600DBC5BA /* CircleBuffer.cpp in Sources */,
+				CCDD5C31137EE77600DBC5BA /* MACLib.cpp in Sources */,
+				CCDD5C32137EE77600DBC5BA /* md5.cpp in Sources */,
+				CCDD5C33137EE77600DBC5BA /* NewPredictor.cpp in Sources */,
+				CCDD5C34137EE77600DBC5BA /* NNFilter.cpp in Sources */,
+				CCDD5C35137EE77600DBC5BA /* Prepare.cpp in Sources */,
+				CCDD5C36137EE77600DBC5BA /* StdLibFileIO.cpp in Sources */,
+				CCDD5C37137EE77600DBC5BA /* UnBitArray.cpp in Sources */,
+				CCDD5C38137EE77600DBC5BA /* UnBitArrayBase.cpp in Sources */,
+				CCDD5C39137EE77600DBC5BA /* AmioApeSettingsDialogMac.cpp in Sources */,
+				CCDD5C3A137EE77600DBC5BA /* SettingsDialogController.mm in Sources */,
+				CC556C9A1382C44600668221 /* AmioApeInterface.cpp in Sources */,
+				CC556C9B1382C44600668221 /* AmioApePrivateSettings.cpp in Sources */,
+				CC556C9C1382C44600668221 /* ApeReader.cpp in Sources */,
+				CC556C9D1382C44600668221 /* ApeWriter.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB913B08733D840010E9CD /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				PRODUCT_NAME = AmioApe;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Default;
+		};
+		1DEB913F08733D840010E9CD /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					_DEBUG,
+					"DEBUG=1",
+				);
+				GCC_VERSION = 4.0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../AmioSDK,
+					"$(HEADER_SEARCH_PATHS_QUOTED_FOR_PROJECT_1)",
+				);
+				HEADER_SEARCH_PATHS_QUOTED_FOR_PROJECT_1 = "\"../../Common/Monkeys Audio Modified Source\"";
+				INFOPLIST_FILE = Info.plist;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = "-fvisibility-ms-compat";
+				PREBINDING = NO;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
+				PRODUCT_NAME = AmioApe;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Default;
+		};
+		CCDD5C40137EE77600DBC5BA /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = NDEBUG;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				PRODUCT_NAME = AmioApe;
+				SEPARATE_STRIP = YES;
+				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB913A08733D840010E9CD /* Build configuration list for PBXNativeTarget "AmioApe.Debug" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB913B08733D840010E9CD /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		1DEB913E08733D840010E9CD /* Build configuration list for PBXProject "AmioApe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB913F08733D840010E9CD /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		CCDD5C3F137EE77600DBC5BA /* Build configuration list for PBXNativeTarget "AmioApe.Release" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CCDD5C40137EE77600DBC5BA /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 089C1669FE841209C02AAC07 /* Project object */;
+}
