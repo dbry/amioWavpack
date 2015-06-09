@@ -1,0 +1,6 @@
+*.ncb
+*.suo
+*.user
+Amio/Windows Sample/AmioApe/Debug/
+Amio/Windows Sample/AmioApe/Release/
+Amio/Windows Sample/AmioApe/x64/
