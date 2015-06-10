@@ -1,6 +1,6 @@
 ******************************************************************
- Adobe Audition CS5.5 / CS6 File Filter for WavPack    2014-06-18
- Copyright (c) 2014 Conifer Software.  All Rights Reserved.
+ Adobe Audition CS5.5 / CS6 File Filter for WavPack    2015-06-09
+ Copyright (c) 2015 David Bryant.  All Rights Reserved.
 ******************************************************************
 
                    ---- INTRODUCTION ----
@@ -72,5 +72,6 @@ www.wavpack.com for the latest versions of WavPack and this plugin.
 Version 1.0 - Initial release
 Version 1.1 - Fix crash on invoking compression dialog (Audition CS5.5)
 Version 1.2 - Enhancements and fixes to saving of multichannel files (beyond 5.1)
+Version 1.3 - Performance improvements from assembly optimizations (WavPack 4.75)
 
 Many thanks to the team at Adobe for inviting me to participate!

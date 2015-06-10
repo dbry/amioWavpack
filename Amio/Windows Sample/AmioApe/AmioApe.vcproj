@@ -46,8 +46,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..;..\..\AmioSDK;&quot;..\..\Common\Monkeys Audio Modified Source&quot;;&quot;..\..\Common\AmioApe&quot;"
-				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;OPT_MMX"
+				AdditionalIncludeDirectories="..\..\..;..\..\AmioSDK;..\..\Common\AmioApe"
+				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -71,9 +71,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="kernel32.lib"
+				AdditionalDependencies="kernel32.lib libwavpack.lib"
 				OutputFile="$(OutDir)\AmioWavpack.amio"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\Common\Wavpack\lib"
 				ModuleDefinitionFile="AmioApe.def"
 				GenerateDebugInformation="true"
 				LargeAddressAware="2"
@@ -130,7 +131,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..;..\..\AmioSDK;&quot;..\..\Common\Monkeys Audio Modified Source&quot;;&quot;..\..\Common\AmioApe&quot;"
+				AdditionalIncludeDirectories="..\..\..;..\..\AmioSDK;..\..\Common\AmioApe"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -155,9 +156,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="kernel32.lib"
+				AdditionalDependencies="kernel32.lib libwavpack.lib"
 				OutputFile="$(OutDir)\AmioWavpack.amio"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\Common\Wavpack\lib\x64"
 				ModuleDefinitionFile="AmioApe.def"
 				GenerateDebugInformation="true"
 				LargeAddressAware="2"
@@ -215,8 +217,8 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\..;..\..\AmioSDK;&quot;..\..\Common\Monkeys Audio Modified Source&quot;;&quot;..\..\Common\AmioApe&quot;"
-				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;OPT_MMX"
+				AdditionalIncludeDirectories="..\..\..;..\..\AmioSDK;..\..\Common\AmioApe"
+				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
 				EnableFunctionLevelLinking="true"
@@ -224,7 +226,7 @@
 				FloatingPointModel="2"
 				TreatWChar_tAsBuiltInType="false"
 				WarningLevel="3"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -237,11 +239,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="kernel32.lib"
+				AdditionalDependencies="kernel32.lib libwavpack.lib"
 				OutputFile="$(OutDir)\AmioWavpack.amio"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\Common\Wavpack\lib"
 				ModuleDefinitionFile="AmioApe.def"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				LargeAddressAware="2"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
@@ -302,7 +305,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\..;..\..\AmioSDK;&quot;..\..\Common\Monkeys Audio Modified Source&quot;;&quot;..\..\Common\AmioApe&quot;"
+				AdditionalIncludeDirectories="..\..\..;..\..\AmioSDK;..\..\Common\AmioApe"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -311,7 +314,7 @@
 				FloatingPointModel="2"
 				TreatWChar_tAsBuiltInType="false"
 				WarningLevel="3"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -324,11 +327,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="kernel32.lib"
+				AdditionalDependencies="kernel32.lib libwavpack.lib"
 				OutputFile="$(OutDir)\AmioWavpack.amio"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\Common\Wavpack\lib\x64"
 				ModuleDefinitionFile="AmioApe.def"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				LargeAddressAware="2"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
@@ -475,62 +479,6 @@
 		<Filter
 			Name="Wavpack"
 			>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\bits.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\extra1.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\extra2.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\float.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\metadata.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\pack.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\tags.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\unpack.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\unpack3.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\unpack3.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\wavpack_local.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\wavpack_version.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\words.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Common\Wavpack\src\wputils.c"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>
