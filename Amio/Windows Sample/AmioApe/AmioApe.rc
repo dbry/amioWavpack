@@ -64,7 +64,7 @@ BEGIN
     CONTROL         "&Normal",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,57,18,38,10
     CONTROL         "&High",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,57,29,30,10
     CONTROL         "&Very High",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,57,40,47,10
-    CTEXT           "WavPack Audio Compression\nVersion 1.3 © 1998-2015\nby David Bryant",IDC_STATIC,121,7,103,28,0,WS_EX_STATICEDGE
+    CTEXT           "WavPack Audio Compression\nVersion 1.4 © 1998-2015\nby David Bryant",IDC_STATIC,121,7,103,28,0,WS_EX_STATICEDGE
 END
 
 
