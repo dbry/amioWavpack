@@ -211,6 +211,8 @@ public:
 			}
 			SetErrorInterface(&iface->GetErrorInterface());
 			bool cancelled = false;
+//dvb: I am eliminating the call to GetSettingsDialogFlags() in the following line so that we do not crash
+//     on Audition 4.0 which uses version 1.0 of the AMIO interface which does not support that method.
 //			AmioResult result = RunExportSettingsDialog(iface->GetFormat(), iface->GetParentWindow(), iface->GetSettingsDialogFlags(), cancelled);
 			AmioResult result = RunExportSettingsDialog(iface->GetFormat(), iface->GetParentWindow(), 0, cancelled);
 			if (result == kAmioInterfaceReturnCode_Success)

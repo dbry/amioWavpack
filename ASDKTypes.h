@@ -31,8 +31,13 @@ namespace asdk
 	typedef short int			int16;
 	typedef unsigned short int	uint16;
 #if defined(ASDK_OS_WIN)
-	typedef long int			int32;
-	typedef unsigned long int	uint32;
+	#if defined(ASDK_MATCH_MAC_STDINT_ON_WINDOWS)
+		typedef int					int32;
+		typedef unsigned int		uint32;
+	#else
+		typedef long int			int32;
+		typedef unsigned long int	uint32;
+	#endif
 	typedef __int64				int64;	
 #elif defined(ASDK_OS_MAC)
 	typedef int					int32;

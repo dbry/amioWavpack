@@ -216,12 +216,23 @@ namespace amio
 																		// at all unless this flag is set.
 
 		kAmioFileFlag_SupportsVideoScaling				= 0x00000020,	// When this flag is set, the application can expect to read video at any arbitrary scaling.
+		
+		kAmioFileFlag_DisableSaveOptimization			= 0x00000040,	// When this flag is set, the app will always call the plug-in to save the file 
+																		// whether or not the audio data or metadata has changed. 
+																		// When this flag is not set and the audio data has not changed,
+																		// the app will simply copy the original data to the target file
+																		// to achieve higher performance during a save/save-as operation.
+																		// Setting this flag gives the plug-in an opportunity to modify any metadata 
+																		// that is known only to the plug-in and not handled by the app.
+																		// Note:  this flag must be set in the "GetExportSettingsInfo" function through inSettingsInfo.GetFormat().SetFileFlags()
+
 	};
 
 	const asdk::int32 kAmioInterfaceVersionMajor = 1;					// Pass this value in AmioGetAmioInfoInterface::SetInterfaceVersion()
-	const asdk::int32 kAmioInterfaceVersionMinor = 1;					// Pass this value in AmioGetAmioInfoInterface::SetInterfaceVersion()
+	const asdk::int32 kAmioInterfaceVersionMinor = 2;					// Pass this value in AmioGetAmioInfoInterface::SetInterfaceVersion()
 																		// 1.0 was the first release with Audition CS5.5, that is Audition 4.0
-																		// 1.1 is a version with some extended interfaces but should be compatible with 1.0 plug-ins.
+																		// 1.1 was a version with some extended interfaces but should be compatible with 1.0 plug-ins.
+																		// 1.2 is a version with a new file flag kAmioFileFlag_DisableSaveOptimization.
 
 	// Used for kAmioInterfaceCommand_GetAmioInfo, Getting information about this plug-in.
 	class AmioGetAmioInfoInterface
