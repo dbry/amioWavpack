@@ -291,7 +291,7 @@ namespace amio
 
             if (inMetadataBuffer && inMetadataBytes) {
                 char msg [256];
-                sprintf (msg, "WavpackReader::FinishWrite() got %u bytes of metadata\n", inMetadataBytes);
+                sprintf (msg, "WavpackWriter::FinishWrite() got %u bytes of metadata\n", inMetadataBytes);
                 OutputDebugStringA (msg);
 
                 WavpackAddWrapper (wpcx, inMetadataBuffer, inMetadataBytes);

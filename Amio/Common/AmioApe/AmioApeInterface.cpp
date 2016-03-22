@@ -146,6 +146,12 @@ protected:
 		extList.push_back("wv");										// A list of supported file extensions
 		amioInfo.AddInputFormat(filterName.c_str(), NULL, extList);		// The extensions that are supported for file reading
 		amioInfo.AddOutputFormat(filterName.c_str(), NULL, extList);	// The extensions that are supported for file writing
+
+		char msg [80];
+		sprintf (msg, "AmioWavpack::GetAmioInfo(): host interface version from template = %c.%c\n",
+			'0'+mHostInterfaceVersionMajor, '0'+mHostInterfaceVersionMinor);
+		OutputDebugStringA (msg);
+
 		return kAmioInterfaceReturnCode_Success;
 	}
 
@@ -420,7 +426,7 @@ protected:
 		{
 			// It's really too bad there is this limit.  We will not bother to try to reduce the bit depth to make 
 			// this file acceptable, and just return an error code.
-			SetErrorString(amio::utils::AsciiToUTF16("WavPack compression is limted to 4GB of input data.").c_str());
+			SetErrorString(amio::utils::AsciiToUTF16("WavPack compression is limted to 2GB of input data.").c_str());
 			return kAmioInterfaceReturnCode_ParameterOutOfRange;
 		}
 
@@ -447,6 +453,12 @@ protected:
 
 		audioFormat.SetXmpHandlerId(kXMP_UnknownFile);
 		asdk::uint32 fileFlags = amio::kAmioFileFlag_XmpSupportThroughPluginOnly | amio::kAmioFileFlag_WriteXmpMetadataBeforeSamples;
+
+		// kAmioFileFlag_DisableSaveOptimization was introduced in AmioInterfaceVersion 1.2 (and we want to use it)
+
+		if (mHostInterfaceVersionMajor > 1 || mHostInterfaceVersionMinor >= 2)
+			fileFlags |= amio::kAmioFileFlag_DisableSaveOptimization;
+
 		audioFormat.SetFileFlags(fileFlags);
 
 		amio::UTF16String desc = amio::utils::AsciiToUTF16("WavPack ") + sampleDepth + amio::utils::AsciiToUTF16("\n") + 

@@ -48,6 +48,7 @@ public:
 				return kAmioInterfaceReturnCode_ParameterOutOfRange;
 			}
 			amioInfo->SetPluginInterfaceVersion(kAmioInterfaceVersionMajor, kAmioInterfaceVersionMinor);
+			amioInfo->GetHostInterfaceVersion(mHostInterfaceVersionMajor, mHostInterfaceVersionMinor);
 			return GetAmioInfo(*amioInfo);
 		}
 
@@ -211,10 +212,15 @@ public:
 			}
 			SetErrorInterface(&iface->GetErrorInterface());
 			bool cancelled = false;
-//dvb: I am eliminating the call to GetSettingsDialogFlags() in the following line so that we do not crash
-//     on Audition 4.0 which uses version 1.0 of the AMIO interface which does not support that method.
-//			AmioResult result = RunExportSettingsDialog(iface->GetFormat(), iface->GetParentWindow(), iface->GetSettingsDialogFlags(), cancelled);
-			AmioResult result = RunExportSettingsDialog(iface->GetFormat(), iface->GetParentWindow(), 0, cancelled);
+			AmioResult result;
+
+			// GetSettingsDialogFlags() method was introduced in AmioInterfaceVersion 1.1 (so don't call it before that or we crash)
+
+			if (mHostInterfaceVersionMajor > 1 || mHostInterfaceVersionMinor >= 1)
+				result = RunExportSettingsDialog(iface->GetFormat(), iface->GetParentWindow(), iface->GetSettingsDialogFlags(), cancelled);
+			else
+				result = RunExportSettingsDialog(iface->GetFormat(), iface->GetParentWindow(), 0, cancelled);
+
 			if (result == kAmioInterfaceReturnCode_Success)
 			{
 				iface->SetCancel(cancelled);
@@ -395,6 +401,8 @@ protected:
 	}
 
 protected:
+	asdk::int32 mHostInterfaceVersionMajor, mHostInterfaceVersionMinor;
+
 	///
 	void SetErrorInterface(AmioErrorInterface *inErrorInterface)
 	{
