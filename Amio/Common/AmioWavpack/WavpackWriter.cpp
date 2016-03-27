@@ -11,7 +11,6 @@
 **************************************************************************/
 
 #include "AmioSDK.h"
-#include "AmioInterfaceTemplate.h"
 #include "AmioUtilities.h"
 
 #include "windows.h"    // for OutputDebugStringA ()

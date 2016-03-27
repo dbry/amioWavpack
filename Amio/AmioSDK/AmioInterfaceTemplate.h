@@ -401,7 +401,7 @@ protected:
 	}
 
 protected:
-	asdk::int32 mHostInterfaceVersionMajor, mHostInterfaceVersionMinor;
+	static asdk::int32 mHostInterfaceVersionMajor, mHostInterfaceVersionMinor;
 
 	///
 	void SetErrorInterface(AmioErrorInterface *inErrorInterface)
@@ -424,6 +424,9 @@ protected:
 
 	AmioErrorInterface *mErrorInterface;
 };
+
+template<class ReadT, class WriteT> asdk::int32 AmioInterfaceTemplate<ReadT, WriteT>::mHostInterfaceVersionMajor;
+template<class ReadT, class WriteT> asdk::int32 AmioInterfaceTemplate<ReadT, WriteT>::mHostInterfaceVersionMinor;
 
 } // namespace amio
 

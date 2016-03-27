@@ -11,7 +11,6 @@
 **************************************************************************/
 
 #include "AmioSDK.h"
-#include "AmioInterfaceTemplate.h"
 #include "AmioUtilities.h"
 
 #include "windows.h"    // for OutputDebugStringA ()
@@ -80,14 +79,14 @@ namespace
     {
         ifstream *is = reinterpret_cast<ifstream*>(id);
         is->read (reinterpret_cast<char*>(data), bcount);
-        return is->gcount ();
+        return (int32_t) is->gcount ();
     }
 
     uint32_t get_pos (void *id)
     {
         ifstream *is = reinterpret_cast<ifstream*>(id);
         streampos current = is->tellg ();
-        return current;
+        return (uint32_t) current;
     }
 
     int set_pos_abs (void *id, uint32_t pos)
@@ -118,9 +117,9 @@ namespace
         ifstream *is = reinterpret_cast<ifstream*>(id);
         streampos current = is->tellg ();
         is->seekg (0, ios::end);
-        int streamsize = is->tellg();
+        streamsize size = is->tellg();
         is->seekg (current, ios::beg);
-        return streamsize;
+        return (uint32_t) size;
     }
 
     int can_seek (void *id)
@@ -387,7 +386,7 @@ namespace amio
 		///
 		int GetRiffMetadataItemCount() const
 		{
-			return mRiffMetadataItems.size();
+			return (int) mRiffMetadataItems.size();
 		}
 
 		///

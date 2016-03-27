@@ -147,7 +147,7 @@ protected:
 		amioInfo.AddInputFormat(filterName.c_str(), NULL, extList);		// The extensions that are supported for file reading
 		amioInfo.AddOutputFormat(filterName.c_str(), NULL, extList);	// The extensions that are supported for file writing
 
-		char msg [80];
+		char msg [128];
 		sprintf (msg, "AmioWavpack::GetAmioInfo(): host interface version from template = %c.%c\n",
 			'0'+mHostInterfaceVersionMajor, '0'+mHostInterfaceVersionMinor);
 		OutputDebugStringA (msg);
@@ -524,7 +524,7 @@ protected:
 			return kAmioInterfaceReturnCode_UnsupportedFormat;
 		}
 
-        int numChannels = amioFormat.GetChannelCount();
+        int numChannels = (int) amioFormat.GetChannelCount();
         int channelMask = 0, definedChannels = 0, i;
 
         // First, go though the channels and determine how many are MS defined (and not duplicates)
@@ -811,8 +811,8 @@ protected:
 ///
 extern "C" AMIO_EXPORT AmioResult AmioInterface(asdk::int32 inCommand, void* inState, void* inInterface)
 {
-	AmioWavpackInterface apeInterface;
-	return apeInterface.EntryPoint(inCommand, inState, inInterface);
+	AmioWavpackInterface wavpackInterface;
+	return wavpackInterface.EntryPoint(inCommand, inState, inInterface);
 }
 
 } // namespace amio

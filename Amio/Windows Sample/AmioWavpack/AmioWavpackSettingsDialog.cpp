@@ -92,8 +92,8 @@ namespace
 
 		case  WM_COMMAND:
 		{
-	  		short item = wParam & 0x0000FFFF;
-			short cmd = wParam >> 16;
+	  		short item = (short) (wParam & 0x0000FFFF);
+			short cmd = (short) (wParam >> 16);
 
 			switch  (item)
 			{

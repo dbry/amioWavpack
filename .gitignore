@@ -2,6 +2,6 @@
 *.ncb
 *.suo
 *.user
-Amio/Windows Sample/AmioApe/Debug/
-Amio/Windows Sample/AmioApe/Release/
-Amio/Windows Sample/AmioApe/x64/
+Amio/Windows Sample/AmioWavpack/Debug/
+Amio/Windows Sample/AmioWavpack/Release/
+Amio/Windows Sample/AmioWavpack/x64/
