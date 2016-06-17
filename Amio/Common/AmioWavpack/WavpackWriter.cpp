@@ -145,7 +145,7 @@ namespace amio
 	{
 	public:
 		///
-        Impl () : wpcx (NULL), wv_file (NULL), wvc_file (NULL), num_samples (-1), samples_written (0), channel_reorder (NULL)
+        Impl () : wpcx (NULL), wv_file (NULL), wvc_file (NULL), samples_requested (-1), samples_written (0), channel_reorder (NULL)
         {
             memset (&wpconfig, 0, sizeof (wpconfig));
 			mSampleRate = 0;
@@ -197,13 +197,6 @@ namespace amio
 			asdk::int32 inCompressionLevel,
 			ExtendedError& outExtendedError)
 		{
-			asdk::int64 totalInputBytes = inSampleCount * inNumChannels * inBytesPerSample;
-			if (totalInputBytes > 0x000000007FF00000LL)
-			{
-				outExtendedError = kExtendedError_TooMuchData;
-				return false;
-			}
-
             wv_file = new write_helper;
 
             if (!wv_file->open (inFileName)) {
@@ -248,8 +241,6 @@ namespace amio
             if (inBytesPerSample == 4)
                 wpconfig.float_norm_exp = 127;
 
-//          wpconfig.flags = CONFIG_OPTIMIZE_MONO;
-
             if (inCompressionLevel == 1000)
                 wpconfig.flags |= CONFIG_FAST_FLAG;
             else if (inCompressionLevel == 3000)
@@ -257,12 +248,13 @@ namespace amio
             else if (inCompressionLevel == 4000)
                 wpconfig.flags |= CONFIG_VERY_HIGH_FLAG;
 
-            WavpackSetConfiguration (wpcx, &wpconfig, static_cast<uint32_t>(inSampleCount));
+            WavpackSetConfiguration64 (wpcx, &wpconfig, inSampleCount);
             WavpackPackInit (wpcx);
 
 			mSampleRate = inSampleRate;
 			mChannelCount = inNumChannels;
 			mBytesPerSample = inBytesPerSample;
+			samples_requested = inSampleCount;
 
 			outExtendedError = kExtendedError_NoError;
 			return true;
@@ -297,7 +289,7 @@ namespace amio
                 WavpackFlushSamples (wpcx);
             }
 
-            if (num_samples != samples_written || inMetadataBytes) {
+            if (samples_requested != samples_written || inMetadataBytes) {
                 if (wv_file && wv_file->get_first_block ()) {
                     WavpackUpdateNumSamples (wpcx, wv_file->get_first_block ());
                     wv_file->put_back_first_block ();
@@ -317,7 +309,7 @@ namespace amio
         WavpackContext *wpcx;
         write_helper *wv_file, *wvc_file;
         WavpackConfig wpconfig;
-        unsigned int num_samples, samples_written;
+        asdk::int64 samples_requested, samples_written;
         unsigned char *channel_reorder;
 
 	public:

@@ -422,14 +422,6 @@ protected:
 		}
 
 		asdk::int64 totalInputBytes = audioFormat.GetSampleTotal() * bytesPerSample * audioFormat.GetChannelCount();
-		if (totalInputBytes > 0x000000007FF00000LL)
-		{
-			// It's really too bad there is this limit.  We will not bother to try to reduce the bit depth to make 
-			// this file acceptable, and just return an error code.
-			SetErrorString(amio::utils::AsciiToUTF16("WavPack compression is limted to 2GB of input data.").c_str());
-			return kAmioInterfaceReturnCode_ParameterOutOfRange;
-		}
-
 		double sizeFactorGuess = privateSettings.GetEstimatedCompressionFactor();
 		asdk::int64 estimatedSize = static_cast<asdk::int64>(sizeFactorGuess * totalInputBytes);
 
