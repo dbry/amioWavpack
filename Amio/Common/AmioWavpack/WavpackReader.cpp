@@ -75,70 +75,6 @@ namespace
 		asdk::int32	mRawBufferOffset;		// The offset into the raw metadata buffer where this item starts.
 	};
 
-    int32_t read_bytes (void *id, void *data, int32_t bcount)
-    {
-        ifstream *is = reinterpret_cast<ifstream*>(id);
-        is->read (reinterpret_cast<char*>(data), bcount);
-        return (int32_t) is->gcount ();
-    }
-
-    uint32_t get_pos (void *id)
-    {
-        ifstream *is = reinterpret_cast<ifstream*>(id);
-        streampos current = is->tellg ();
-        return (uint32_t) current;
-    }
-
-    int set_pos_abs (void *id, uint32_t pos)
-    {
-        ifstream *is = reinterpret_cast<ifstream*>(id);
-        if (!is->good()) is->clear ();
-        is->seekg (pos, ios::beg);
-        return is->fail () ? 1 : 0;
-    }
-
-    int set_pos_rel (void *id, int32_t delta, int mode)
-    {
-        ifstream *is = reinterpret_cast<ifstream*>(id);
-        if (!is->good()) is->clear ();
-        is->seekg (delta, mode);
-        return is->fail () ? 1 : 0;
-    }
-
-    int push_back_byte (void *id, int c)
-    {
-        ifstream *is = reinterpret_cast<ifstream*>(id);
-        is->putback (c);
-        return c;
-    }
-
-    uint32_t get_length (void *id)
-    {
-        ifstream *is = reinterpret_cast<ifstream*>(id);
-        streampos current = is->tellg ();
-        is->seekg (0, ios::end);
-        streamsize size = is->tellg();
-        is->seekg (current, ios::beg);
-        return (uint32_t) size;
-    }
-
-    int can_seek (void *id)
-    {
-        ifstream *is = reinterpret_cast<ifstream*>(id);
-        return 1;
-    }
-
-    int32_t write_bytes (void *id, void *data, int32_t bcount)
-    {
-        ifstream *is = reinterpret_cast<ifstream*>(id);
-        return 0;
-    }
-
-    WavpackStreamReader freader = {
-        read_bytes, get_pos, set_pos_abs, set_pos_rel, push_back_byte, get_length, can_seek,
-        write_bytes
-    };
-
 } // private namespace
 
 namespace amio
@@ -179,12 +115,6 @@ namespace amio
                 wpcx = NULL;
             }
 
-            if (wv_file.is_open ())
-                wv_file.close ();
-
-            if (wvc_file.is_open ())
-                wvc_file.close ();
-
 			BufferSizeReset(0);
 			mExpectedSeekPosition = 0;
 			mRiffMetadataItems.clear();
@@ -195,29 +125,17 @@ namespace amio
 		{
 			Close();
 
-#ifdef AMIO_OS_WIN
-            wv_file.open (reinterpret_cast<const wchar_t *>(inFileName.c_str()), ios::binary);
-
-            if (!wv_file.is_open ())
-				return kError_General;
-
-            UTF16String wvcFileName = inFileName + static_cast<UTF16Char>('c');
-            wvc_file.open (reinterpret_cast<const wchar_t *>(wvcFileName.c_str()), ios::binary);
-#else
             UTF8String inFileNameUTF8 = amio::utils::UTF16StringtoUTF8String (inFileName);
-            wv_file.open (reinterpret_cast<const char *>(inFileNameUTF8.c_str()), ios::binary);
 
-            if (!wv_file.is_open ())
-				return kError_General;
+            // This used to use an ifstream and the version of WavPack file open() that uses
+            // callbacks. However, I discovered that the MSVC 2008 version of ifstream did not
+            // handle 64-bit file pointers (!) and so could not handle the large files that were
+            // the very purpose of this update. However, since I had recently added the ability
+            // to open by UTF8 filenames, this became an easy solution (the only reason we were
+            // using the callback method before was because of Unicode filenames).
 
-            UTF8String wvcFileName = inFileNameUTF8 + static_cast<UTF8Char>('c');
-            wvc_file.open (reinterpret_cast<const char *>(wvcFileName.c_str()), ios::binary);
-#endif
-
-            if (wvc_file.is_open ())
-                wpcx = WavpackOpenFileInputEx (&freader, &wv_file, &wvc_file, error, OPEN_WRAPPER | OPEN_NORMALIZE, 0);
-            else
-                wpcx = WavpackOpenFileInputEx (&freader, &wv_file, NULL, error, OPEN_WRAPPER | OPEN_NORMALIZE, 0);
+            wpcx = WavpackOpenFileInput (reinterpret_cast<const char *>(inFileNameUTF8.c_str()),
+                error, OPEN_WVC | OPEN_WRAPPER | OPEN_NORMALIZE | OPEN_FILE_UTF8, 0);
 
 			if (wpcx == NULL)
 			{
@@ -242,8 +160,7 @@ namespace amio
 			mChannels = WavpackGetNumChannels (wpcx);
             mChannelMask = WavpackGetChannelMask (wpcx);
 			mAverageBitRate = static_cast<int>(WavpackGetAverageBitrate (wpcx, 1)); 
-			unsigned int blockCount = WavpackGetNumSamples (wpcx); 
-			mSampleCount = static_cast<asdk::int64>(blockCount);
+			mSampleCount = WavpackGetNumSamples64 (wpcx); 
 
             if (WavpackGetWrapperBytes (wpcx)) {
                 WavpackFreeWrapper (wpcx);
@@ -408,7 +325,6 @@ namespace amio
 	protected:
         WavpackContext                  *wpcx;
         char                            error [80];
-        ifstream                        wv_file, wvc_file;
 		asdk::int64						mExpectedSeekPosition;
 		std::auto_ptr<char>				mInterleavedBuffer;
 		int								mInterleavedBufferSizeInBytes;
