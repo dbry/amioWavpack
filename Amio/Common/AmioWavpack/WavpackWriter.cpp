@@ -248,7 +248,7 @@ namespace amio
             else if (inCompressionLevel == 4000)
                 wpconfig.flags |= CONFIG_VERY_HIGH_FLAG;
 
-            WavpackSetConfiguration64 (wpcx, &wpconfig, inSampleCount);
+            WavpackSetConfiguration64 (wpcx, &wpconfig, inSampleCount, NULL);
             WavpackPackInit (wpcx);
 
 			mSampleRate = inSampleRate;

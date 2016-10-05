@@ -135,7 +135,7 @@ namespace amio
             // using the callback method before was because of Unicode filenames).
 
             wpcx = WavpackOpenFileInput (reinterpret_cast<const char *>(inFileNameUTF8.c_str()),
-                error, OPEN_WVC | OPEN_WRAPPER | OPEN_NORMALIZE | OPEN_FILE_UTF8, 0);
+                error, OPEN_WVC | OPEN_WRAPPER | OPEN_NORMALIZE | OPEN_FILE_UTF8 | OPEN_DSD_AS_PCM, 0);
 
 			if (wpcx == NULL)
 			{
