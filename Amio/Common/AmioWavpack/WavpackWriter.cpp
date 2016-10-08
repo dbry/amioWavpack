@@ -145,7 +145,7 @@ namespace amio
 	{
 	public:
 		///
-        Impl () : wpcx (NULL), wv_file (NULL), wvc_file (NULL), samples_requested (-1), samples_written (0), channel_reorder (NULL)
+        Impl () : wpcx (NULL), wv_file (NULL), wvc_file (NULL), samples_requested (-1), samples_written (0), riff_metadata (0), channel_reorder (NULL)
         {
             memset (&wpconfig, 0, sizeof (wpconfig));
 			mSampleRate = 0;
@@ -272,24 +272,66 @@ namespace amio
             return WavpackPackSamples (wpcx, reinterpret_cast<int32_t *>(inBuffer), inSampleCount) ? true : false;
 		}
 
+		/// Flush file being written. Use after all samples have been written or after RIFF data has been written
+		bool FlushWrite(void)
+		{
+            if (!wpcx)
+                return false;
+
+			return WavpackFlushSamples (wpcx) ? true : false;
+		}
+
+		/// Add specified RIFF metadata to file as trailing "wrapper"
+		bool AddRiffMetadata(void* inMetadataBuffer, int inMetadataBytes)
+		{
+            if (!wpcx)
+                return false;
+
+            if (inMetadataBuffer && inMetadataBytes) {
+                char msg [256];
+                sprintf (msg, "WavpackWriter::AddRiffMetadata() got %u bytes of metadata\n", inMetadataBytes);
+                OutputDebugStringA (msg);
+
+				riff_metadata += inMetadataBytes;
+                return WavpackAddWrapper (wpcx, inMetadataBuffer, inMetadataBytes) ? true : false;
+            }
+
+			return true;
+		}
+
+		/// Add specified tag metadata to the file (either text or binary; goes in APEv2 tag)
+		bool AddTagMetadata(void* inMetadataBuffer, int inMetadataBytes, bool inIsBinary)
+		{
+            if (!wpcx)
+                return false;
+
+            if (inMetadataBuffer && inMetadataBytes) {
+				int item_len = (int) strlen ((char *) inMetadataBuffer);
+                char msg [256];
+                sprintf (msg, "WavpackWriter::AddTagMetadata() got %u bytes of %s metadata\n", inMetadataBytes, inIsBinary ? "binary" : "text");
+                OutputDebugStringA (msg);
+
+				if (inIsBinary)
+					return WavpackAppendBinaryTagItem (wpcx, (char *) inMetadataBuffer, (char *) inMetadataBuffer + item_len + 1,
+						inMetadataBytes - item_len - 1) ? true : false;
+				else
+					return WavpackAppendTagItem (wpcx, (char *) inMetadataBuffer, (char *) inMetadataBuffer + item_len + 1,
+						inMetadataBytes - item_len - 1) ? true : false;
+            }
+
+			return true;
+		}
+
 		/// Finish and close the file being written, or cancel writing.
-		bool FinishWrite(bool inCancelMode, void* inMetadataBuffer, int inMetadataBytes)
+		bool FinishWrite(bool inCancelMode)
 		{
             if (!wpcx)
                 return false;
 
             WavpackFlushSamples (wpcx);
+            WavpackWriteTag (wpcx);
 
-            if (inMetadataBuffer && inMetadataBytes) {
-                char msg [256];
-                sprintf (msg, "WavpackWriter::FinishWrite() got %u bytes of metadata\n", inMetadataBytes);
-                OutputDebugStringA (msg);
-
-                WavpackAddWrapper (wpcx, inMetadataBuffer, inMetadataBytes);
-                WavpackFlushSamples (wpcx);
-            }
-
-            if (samples_requested != samples_written || inMetadataBytes) {
+            if (samples_requested != samples_written || riff_metadata) {
                 if (wv_file && wv_file->get_first_block ()) {
                     WavpackUpdateNumSamples (wpcx, wv_file->get_first_block ());
                     wv_file->put_back_first_block ();
@@ -309,7 +351,7 @@ namespace amio
         WavpackContext *wpcx;
         write_helper *wv_file, *wvc_file;
         WavpackConfig wpconfig;
-        asdk::int64 samples_requested, samples_written;
+        asdk::int64 samples_requested, samples_written, riff_metadata;
         unsigned char *channel_reorder;
 
 	public:
@@ -377,10 +419,28 @@ namespace amio
 		return mImpl->WriteSampleBytes(inStartByte, inByteCount, inBuffer);
 	}
 
-	// Finish and close the file being written, or cancel writing.
-	bool WavpackWriter::FinishWrite(bool inCancelMode, void* inMetadataBuffer, int inMetadataBytes)
+	/// Flush file being written. Use after all samples have been written or after RIFF data has been written
+	bool WavpackWriter::FlushWrite(void)
 	{
-		return mImpl->FinishWrite(inCancelMode, inMetadataBuffer, inMetadataBytes);
+		return mImpl->FlushWrite();
+	}
+
+	/// Add specified data to the RIFF trailing wrapper written to file
+	bool WavpackWriter::AddRiffMetadata(void* inMetadataBuffer, int inMetadataBytes)
+	{
+		return mImpl->AddRiffMetadata(inMetadataBuffer, inMetadataBytes);
+	}
+
+	/// Add specified tag metadata to the file (either text or binary; goes in APEv2 tag)
+	bool WavpackWriter::AddTagMetadata(void* inMetadataBuffer, int inMetadataBytes, bool inIsBinary)
+	{
+		return mImpl->AddTagMetadata(inMetadataBuffer, inMetadataBytes, inIsBinary);
+	}
+
+	/// Finish and close the file being written, or cancel writing.
+	bool WavpackWriter::FinishWrite(bool inCancelMode)
+	{
+		return mImpl->FinishWrite(inCancelMode);
 	}
 
 } //namespace amio

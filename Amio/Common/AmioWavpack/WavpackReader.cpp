@@ -56,6 +56,21 @@ namespace
 		}
 	}
 
+	// This structure describes an item of tag metadata found in the media file (from an APEv2 tag).
+	struct TagMetadataItem
+	{
+		inline TagMetadataItem(asdk::uint8* inData, asdk::int32 inSize, bool inIsBinary)
+			: mData(inData)
+			, mSize(inSize)
+			, mIsBinary(inIsBinary)
+		{
+		}
+
+		asdk::uint8* mData;					// The actual data of this metadata item
+		asdk::int32	mSize;					// The size in bytes of this metadata item.
+		bool mIsBinary;						// Indicates that the item is a binary tag
+	};
+
 	// This structure describes an item of metadata found in the media file.
 	struct MetadataItem
 	{
@@ -118,6 +133,8 @@ namespace amio
 			BufferSizeReset(0);
 			mExpectedSeekPosition = 0;
 			mRiffMetadataItems.clear();
+			for (int n = 0; n < mTagMetadataItems.size(); ++n) delete mTagMetadataItems[n].mData;
+			mTagMetadataItems.clear();
 		}
 
 		///
@@ -135,7 +152,7 @@ namespace amio
             // using the callback method before was because of Unicode filenames).
 
             wpcx = WavpackOpenFileInput (reinterpret_cast<const char *>(inFileNameUTF8.c_str()),
-                error, OPEN_WVC | OPEN_WRAPPER | OPEN_NORMALIZE | OPEN_FILE_UTF8 | OPEN_DSD_AS_PCM, 0);
+                error, OPEN_WVC | OPEN_WRAPPER | OPEN_TAGS | OPEN_NORMALIZE | OPEN_FILE_UTF8 | OPEN_DSD_AS_PCM, 0);
 
 			if (wpcx == NULL)
 			{
@@ -212,6 +229,63 @@ namespace amio
 						size++;		// RIFF chunks are word aligned.
 					bufferOffset += size;
 				}
+			}
+
+			if (mMode & MODE_VALID_TAG) {
+				int binary_items = WavpackGetNumBinaryTagItems (wpcx);
+				int text_items = WavpackGetNumTagItems (wpcx);
+				asdk::int32 item_len, value_len;
+				asdk::uint8* data;
+				char *item;
+				int i;
+
+				for (i = 0; i < text_items; ++i) {
+					item_len = WavpackGetTagItemIndexed (wpcx, i, NULL, 0);
+					item = new char [item_len + 1];
+					WavpackGetTagItemIndexed (wpcx, i, item, item_len + 1);
+					value_len = WavpackGetTagItem (wpcx, item, NULL, 0);
+
+					if (value_len) {
+						data = new asdk::uint8 [item_len + 1 + value_len + 1];
+						memcpy (data, item, item_len + 1);
+						WavpackGetTagItem (wpcx, item, (char *) data + item_len + 1, value_len + 1);
+						mTagMetadataItems.push_back(TagMetadataItem (data, item_len + 1 + value_len, false));
+					}
+
+					delete item;
+				}
+
+				for (i = 0; i < binary_items; ++i) {
+					item_len = WavpackGetBinaryTagItemIndexed (wpcx, i, NULL, 0);
+					item = new char [item_len + 1];
+					WavpackGetBinaryTagItemIndexed (wpcx, i, item, item_len + 1);
+					value_len = WavpackGetBinaryTagItem (wpcx, item, NULL, 0);
+
+					if (value_len) {
+						data = new asdk::uint8 [item_len + 1 + value_len];
+						memcpy (data, item, item_len + 1);
+						WavpackGetBinaryTagItem (wpcx, item, (char *) data + item_len + 1, value_len);
+						mTagMetadataItems.push_back(TagMetadataItem (data, item_len + 1 + value_len, true));
+					}
+
+					delete item;
+				}
+
+#if 0
+				for (i = 0; i < mTagMetadataItems.size(); ++i) {
+					int item_len = (int) strlen ((char *) mTagMetadataItems[i].mData);
+					char msg [256];
+
+					if (mTagMetadataItems[i].mIsBinary)
+						sprintf (msg, "    \"%s\" (%d) = %d bytes of binary data\n", (char *) mTagMetadataItems[i].mData,
+							item_len, mTagMetadataItems[i].mSize - item_len - 1);
+					else
+						sprintf (msg, "    \"%s\" (%d) = \"%s\"\n", (char *) mTagMetadataItems[i].mData,
+							item_len, (char *) mTagMetadataItems[i].mData + item_len + 1);
+
+					OutputDebugStringA (msg);
+				}
+#endif
 			}
 
 			return kError_NoError;
@@ -295,12 +369,6 @@ namespace amio
 		}
 
 		///
-		asdk::uint8* GetMetadataBuffer() const
-		{
-			return mMetadataBuffer.get();
-		}
-
-		///
 		int GetRiffMetadataItemCount() const
 		{
 			return (int) mRiffMetadataItems.size();
@@ -321,6 +389,24 @@ namespace amio
 			return (&mMetadataBuffer.get()[mRiffMetadataItems[inIndex].mRawBufferOffset]);
 		}
 
+		///
+		int GetTagMetadataItemCount() const
+		{
+			return (int) mTagMetadataItems.size();
+		}
+
+		///
+		const asdk::uint8* GetTagMetadataItem(int inIndex, asdk::int32& outSize, bool& outIsBinary)
+		{
+			if (inIndex >= GetTagMetadataItemCount())
+			{
+				return NULL;
+			}
+			outSize = mTagMetadataItems[inIndex].mSize;
+			outIsBinary = mTagMetadataItems[inIndex].mIsBinary;
+			return mTagMetadataItems[inIndex].mData;
+		}
+
 
 	protected:
         WavpackContext                  *wpcx;
@@ -332,6 +418,7 @@ namespace amio
 		asdk::int32						mInterleavedBufferSampleBlocksValid;
 		std::auto_ptr<asdk::uint8>		mMetadataBuffer;
 		std::vector<MetadataItem>		mRiffMetadataItems;
+		std::vector<TagMetadataItem>	mTagMetadataItems;
 
 	public:
         int             mMode;
@@ -418,18 +505,6 @@ namespace amio
 	}
 
 	///
-	asdk::int32 WavpackReader::GetRawMetadataSize() const
-	{
-		return mImpl->mMetadataSize;
-	}
-
-	///
-	asdk::uint8* WavpackReader::GetRawMetadataBuffer() const
-	{
-		return mImpl->GetMetadataBuffer();
-	}
-
-	///
 	int WavpackReader::GetRiffMetadataItemCount() const
 	{
 		return mImpl->GetRiffMetadataItemCount();
@@ -439,6 +514,18 @@ namespace amio
 	const asdk::uint8* WavpackReader::GetRiffMetadataItem(int inIndex, asdk::int32& outSize) const
 	{
 		return mImpl->GetRiffMetadataItem(inIndex, outSize);
+	}
+
+	///
+	int WavpackReader::GetTagMetadataItemCount() const
+	{
+		return mImpl->GetTagMetadataItemCount();
+	}
+
+	///
+	const asdk::uint8* WavpackReader::GetTagMetadataItem(int inIndex, asdk::int32& outSize, bool& outIsBinary) const
+	{
+		return mImpl->GetTagMetadataItem(inIndex, outSize, outIsBinary);
 	}
 
 } //namespace amio

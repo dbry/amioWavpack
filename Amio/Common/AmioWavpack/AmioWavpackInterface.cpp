@@ -118,6 +118,11 @@ namespace
 namespace amio
 {
 
+// these two IDs are used to pass tag metadata (from APEv2 tags in WavPack) through Audition (presumably unaltered)
+
+const char* kAmioMetadataTypeID_BinaryTagMetadataChunk = "c29ea60a-f827-440d-bfd1-97ecc6a62e03";
+const char* kAmioMetadataTypeID_TextTagMetadataChunk = "5187ccec-fcec-4407-8c8a-3cad1f83f50d";
+
 class AmioWavpackInterface : public AmioInterfaceTemplate<WavpackReader, WavpackWriter>
 {
 protected:
@@ -300,6 +305,22 @@ protected:
 				inFormat.AddMetadataItem(metadataIndex, kAmioMetadataTypeID_GenericWaveMetadataChunk, size, 1.0);
 			}
 		}
+
+		// Pass along information about the tag metadata we found in the file.
+		for (int metadataIndex = 0; metadataIndex < inReadFile.GetTagMetadataItemCount(); metadataIndex++)
+		{
+			bool isBinary = 0;
+			asdk::int32 size = 0;
+			inReadFile.GetTagMetadataItem(metadataIndex, size, isBinary);
+
+			if (isBinary)
+				inFormat.AddMetadataItem(metadataIndex + inReadFile.GetRiffMetadataItemCount(),
+					kAmioMetadataTypeID_BinaryTagMetadataChunk, size, 1.0);
+			else
+				inFormat.AddMetadataItem(metadataIndex + inReadFile.GetRiffMetadataItemCount(),
+					kAmioMetadataTypeID_TextTagMetadataChunk, size, 1.0);
+		}
+
 		return kAmioInterfaceReturnCode_Success;
 	}
 
@@ -340,6 +361,25 @@ protected:
 	{
 		int instanceID = static_cast<int>(inInstanceID);
 		asdk::int32 size = 0;
+		bool isBinary;
+//		char msg [256];
+
+		if (instanceID >= inReadFile.GetRiffMetadataItemCount ()) {
+			const asdk::uint8* sourceBuffer = inReadFile.GetTagMetadataItem(instanceID - inReadFile.GetRiffMetadataItemCount (), size, isBinary);
+
+			if (!sourceBuffer)
+				return kAmioInterfaceReturnCode_NoSuchItem;
+
+			if (inByteCount + inStartOffset > size)
+				return kAmioInterfaceReturnCode_ParameterOutOfRange;
+
+			memcpy(inDestinationBuffer, &sourceBuffer[inStartOffset], static_cast<size_t>(inByteCount));
+//			sprintf (msg, "ReadMetadata: %d bytes read from tag item \"%s\"\n", inByteCount, (char *) sourceBuffer);
+//			OutputDebugStringA (msg);
+
+			return kAmioInterfaceReturnCode_Success;
+		}
+
 		const asdk::uint8* sourceBuffer = inReadFile.GetRiffMetadataItem(instanceID, size);
 		if (!sourceBuffer)
 		{
@@ -353,7 +393,14 @@ protected:
 			// Strip the RIFF header and deliver the raw XMP data.
 			size -= 8;
 			sourceBuffer += 8;
+//			sprintf (msg, "ReadMetadata: _PMX of %d bytes\n", size);
+//			OutputDebugStringA (msg);
 		}
+//		else {
+//			sprintf (msg, "ReadMetadata: %c%c%c%c of %d bytes\n", sourceBuffer [0], sourceBuffer [1], sourceBuffer [2], sourceBuffer [3], size);
+//			OutputDebugStringA (msg);
+//		}
+
 		if (inByteCount + inStartOffset > size)
 		{			
 			return kAmioInterfaceReturnCode_ParameterOutOfRange;
@@ -685,110 +732,91 @@ protected:
 	///
 	virtual AmioResult FinishWrite(WavpackWriter& inWriteFile, bool inIsCancel, const AmioFormatInterface& inFormat)
 	{
-		// Get the metadata we want to write.
-		std::auto_ptr<asdk::int8> metadataBuffer;
-		asdk::int64 totalMetadataSize = 0;
-//      char msg [256];
+		asdk::int32 result = kAmioInterfaceReturnCode_Success;
 
-//      sprintf (msg, "XMP = %s, RIFF = %s\n", kAmioMetadataTypeID_XMP, kAmioMetadataTypeID_GenericWaveMetadataChunk);
-//      OutputDebugStringA (msg);
+		if (!inWriteFile.FlushWrite())
+			result = kAmioInterfaceReturnCode_GeneralError;
+			
+		// loop through all the metadata items, passing them to the riff "wrapper" destination, or to APEv2 tags
 
-		for (int twoPasses = 1; twoPasses <= 2; twoPasses++)
+		for(asdk::int32 metadataIndex = 0; metadataIndex < inFormat.GetMetadataItemCount(); metadataIndex++)
 		{
-            int bufferFillOffset = 0;
+			amio::AsciiString metadataTypeID;
+			asdk::int64 metadataSize = 0;
+			double locationHint;
 
-			for(asdk::int32 metadataIndex = 0; metadataIndex < inFormat.GetMetadataItemCount(); metadataIndex++)
+			if (result != kAmioInterfaceReturnCode_Success)
+				break;
+
+			if (inFormat.GetMetadataItemInfo(metadataIndex, metadataTypeID, metadataSize, locationHint))
 			{
-				amio::AsciiString metadataTypeID;
-				asdk::int64 metadataSize = 0;
-				double locationHint;
+				bool isXMP = false, isGenericWave = false, isTextTag = false, isBinaryTag = false;
 
-				if (inFormat.GetMetadataItemInfo(metadataIndex, metadataTypeID, metadataSize, locationHint))
+				// use the GUID to figure out what kinf of metadata it is
+
+				if (!strnicmp(kAmioMetadataTypeID_XMP, metadataTypeID.c_str(), metadataTypeID.size()))
 				{
-#if 0
-					if (twoPasses == 2) {
-                        sprintf (msg, "FinishWrite, metadata Index %d, TypeID = %s, Size = %d\n",
-                            metadataIndex, metadataTypeID.c_str(), metadataSize);
-                        OutputDebugStringA (msg);
-
-                        if (!strnicmp(kAmioMetadataTypeID_GenericWaveMetadataChunk, metadataTypeID.c_str(), metadataTypeID.size())) {
-                            char *riffbuff = new char [metadataSize];
-                            if (inFormat.GetMetadataItem(metadataIndex, riffbuff, 0, metadataSize))
-                                OutputDebugMemory (riffbuff, metadataSize);
-                            else
-                                OutputDebugStringA ("GetMetadataItem() returned false\n");
-
-                            delete [] riffbuff;
-                        }
-                    }
-#endif
-
-					bool isXMP = false;
-					if (!strnicmp(kAmioMetadataTypeID_XMP, metadataTypeID.c_str(), metadataTypeID.size()))
-					{
-						isXMP = true;
-					}
-					else if (strnicmp(kAmioMetadataTypeID_GenericWaveMetadataChunk, metadataTypeID.c_str(), metadataTypeID.size()))
-					{
-						// We only support XMP or RIFF chunk metadata.
-						continue;
-					}
-
-					if (twoPasses == 1)
-					{
-						// First pass is to compute the size.
-						if (isXMP)
-						{
-							// We need to add 8 bytes to turn this data into a RIFF chunk.
-							metadataSize += 8;
-						}
-						if (metadataSize & 1)
-						{
-							metadataSize++;	// RIFF chunks are WORD aligned.
-						}
-						totalMetadataSize += metadataSize;
-					}
-					else
-					{
-						// Second pass is to read the data.
-						if (metadataBuffer.get() == NULL)
-						{
-							metadataBuffer.reset(new asdk::int8[static_cast<int>(totalMetadataSize)]);
-						}
-
-						if (isXMP)
-						{
-							// Turn this into an XMP RIFF chunk
-							metadataBuffer.get()[bufferFillOffset++] = '_';
-							metadataBuffer.get()[bufferFillOffset++] = 'P';
-							metadataBuffer.get()[bufferFillOffset++] = 'M';
-							metadataBuffer.get()[bufferFillOffset++] = 'X';
-							*(reinterpret_cast<asdk::int32*>(&metadataBuffer.get()[bufferFillOffset])) = static_cast<asdk::int32>(metadataSize);
-							bufferFillOffset += 4;
-						}
-//                      sprintf (msg, "index = %d, size = %lld, bufferOffset = %d\n", metadataIndex, metadataSize, bufferFillOffset);
-//                      OutputDebugStringA (msg);
-
-						inFormat.GetMetadataItem(metadataIndex, metadataBuffer.get() + bufferFillOffset, 0, metadataSize);
-						bufferFillOffset += static_cast<int>(metadataSize);
-						if (bufferFillOffset & 1)
-						{
-							metadataBuffer.get()[bufferFillOffset++] = 0;	// RIFF chunks are WORD aligned.
-						}
-					}
+					isXMP = true;
 				}
+				else if (!strnicmp(kAmioMetadataTypeID_BinaryTagMetadataChunk, metadataTypeID.c_str(), metadataTypeID.size()))
+				{
+					isBinaryTag = true;
+				}
+				else if (!strnicmp(kAmioMetadataTypeID_TextTagMetadataChunk, metadataTypeID.c_str(), metadataTypeID.size()))
+				{
+					isTextTag = true;
+				}
+				else if (!strnicmp(kAmioMetadataTypeID_GenericWaveMetadataChunk, metadataTypeID.c_str(), metadataTypeID.size()))
+				{
+					isGenericWave = true;
+				}
+				else
+				{
+					char msg [256];
+
+					sprintf (msg, "FinishWrite: unknown ID %s, %d bytes, skipping\n", metadataTypeID.c_str(), metadataSize);
+					OutputDebugStringA (msg);
+					continue;
+				}
+
+				if (isXMP)		// for XMP_, we must send an appropriate RIFF header first
+				{
+					char xmp_header [] = "_PMX\0\0\0\0";
+
+					xmp_header [4] = (char) metadataSize;
+					xmp_header [5] = (char) (metadataSize >> 8);
+					xmp_header [6] = (char) (metadataSize >> 16);
+					xmp_header [7] = (char) (metadataSize >> 24);
+
+					if (!inWriteFile.AddRiffMetadata (xmp_header, 8))
+						result = kAmioInterfaceReturnCode_GeneralError;
+				}
+
+				// read the metadata and pad it with a zero byte (for odd riff sizes)
+
+				char *metadataBuffer = new char [metadataSize + 1];
+				inFormat.GetMetadataItem (metadataIndex, metadataBuffer, 0, metadataSize);
+				metadataBuffer [metadataSize] = 0;
+
+				if (isXMP || isGenericWave) {
+					if (!inWriteFile.AddRiffMetadata (metadataBuffer, (int) (metadataSize + (metadataSize & 1))))
+						result = kAmioInterfaceReturnCode_GeneralError;
+				}
+
+				if (isTextTag || isBinaryTag) {
+					if (!inWriteFile.AddTagMetadata (metadataBuffer, (int) metadataSize, isBinaryTag))
+						result = kAmioInterfaceReturnCode_GeneralError;
+				}
+
+				delete metadataBuffer;
 			}
 		}
 
-		asdk::int32 result = kAmioInterfaceReturnCode_GeneralError;
+		if (!inWriteFile.FinishWrite(inIsCancel))
+			result = kAmioInterfaceReturnCode_GeneralError;
 
-//      OutputDebugMemory (metadataBuffer.get(), totalMetadataSize);
-
-		if (inWriteFile.FinishWrite(inIsCancel, metadataBuffer.get(), static_cast<int>(totalMetadataSize)))
-		{
-			result = kAmioInterfaceReturnCode_Success;
-		}
 		delete &inWriteFile;
+
 		if (result != kAmioInterfaceReturnCode_Success)
 		{
 			SetErrorString(amio::utils::AsciiToUTF16("Error completing file writing").c_str());

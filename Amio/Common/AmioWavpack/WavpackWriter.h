@@ -57,8 +57,15 @@ namespace amio
 		/// The byte offset should be the total number of bytes provided prior to this call.
 		bool WriteSampleBytes(asdk::int64 inStartByte, asdk::int32 inSampleCount, void *inBuffer);
 
+		/// Flush file being written. Use after all samples have been written or after RIFF data has been written
+		bool FlushWrite(void);
+
+		/// Add metadata to file being written (either riff data to trailing WAV wrapper or tag data to APEv2 tag)
+		bool AddRiffMetadata(void* inMetadataBuffer, int inMetadataBytes);
+		bool AddTagMetadata(void* inMetadataBuffer, int inMetadataBytes, bool inIsBinary);
+
 		/// Finish and close the file being written, or cancel writing.
-		bool FinishWrite(bool inCancelMode, void* inMetadataBuffer, int inMetadataBytes);
+		bool FinishWrite(bool inCancelMode);
 
 	protected:
 		class Impl;

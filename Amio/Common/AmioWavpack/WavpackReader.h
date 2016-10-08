@@ -70,16 +70,16 @@ namespace amio
 		///
 
 		///
-		asdk::int32 GetRawMetadataSize() const;
-
-		///
-		asdk::uint8* GetRawMetadataBuffer() const;
-
-		///
 		int GetRiffMetadataItemCount() const;
 
 		///
 		const asdk::uint8* GetRiffMetadataItem(int inIndex, asdk::int32& outSize) const;
+
+		///
+		int GetTagMetadataItemCount() const;
+
+		///
+		const asdk::uint8* GetTagMetadataItem(int inIndex, asdk::int32& outSize, bool& outIsBinary) const;
 
 	protected:
 		class Impl;
