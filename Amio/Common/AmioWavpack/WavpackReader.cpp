@@ -179,10 +179,6 @@ namespace amio
 			mAverageBitRate = static_cast<int>(WavpackGetAverageBitrate (wpcx, 1)); 
 			mSampleCount = WavpackGetNumSamples64 (wpcx); 
 
-            if (WavpackGetWrapperBytes (wpcx)) {
-                WavpackFreeWrapper (wpcx);
-            }
-
             WavpackSeekTrailingWrapper (wpcx);
 			mMetadataSize = WavpackGetWrapperBytes (wpcx); 
 
@@ -204,17 +200,6 @@ namespace amio
 					if (bytesLeft < 8)
 						break;
 					asdk::uint32 size = 8 + *(reinterpret_cast<asdk::uint32*>(&mMetadataBuffer.get()[bufferOffset+4]));
-					if (size > static_cast<asdk::uint32>(bytesLeft))
-					{
-                        sprintf (msg, "WavpackReader::Initialize() got RIFF overrun, bufferOffset = %d, bytesLeft = %d, size = %u\n",
-                            bufferOffset, bytesLeft, size);
-                        OutputDebugStringA (msg);
-
-//						if (bufferOffset == 0)
-//						{							
-							break;	// Well, maybe this isn't RIFF metadata after all, we'd better ignore it.
-//						}
-					}
 
 //                  sprintf (msg, "    %c%c%c%c - %d bytes\n",
 //                      mMetadataBuffer.get()[bufferOffset+0],
@@ -224,10 +209,28 @@ namespace amio
 //                      size);
 //                  OutputDebugStringA (msg);
 
-					mRiffMetadataItems.push_back(MetadataItem(size, bufferOffset));
-					if (size & 1)
-						size++;		// RIFF chunks are word aligned.
-					bufferOffset += size;
+					char *chunkptr = (char *) mMetadataBuffer.get() + bufferOffset;
+
+					if (!strncmp (chunkptr, "RIFF", 4) || !strncmp (chunkptr, "RF64", 4))
+						bufferOffset += 12;
+					else if (!strncmp (chunkptr, "data", 4))
+						bufferOffset += 8;
+					else {
+						if (size > static_cast<asdk::uint32>(bytesLeft))
+						{
+							sprintf (msg, "WavpackReader::Initialize() got RIFF overrun, bufferOffset = %d, bytesLeft = %d, size = %u\n",
+								bufferOffset, bytesLeft, size);
+							OutputDebugStringA (msg);
+							break;	// Well, maybe this isn't RIFF metadata after all, we'd better ignore it.
+						}
+
+						if (strncmp (chunkptr, "fmt ", 4) && strncmp (chunkptr, "ds64", 4) && strncmp (chunkptr, "JUNK", 4))
+							mRiffMetadataItems.push_back(MetadataItem(size, bufferOffset));
+
+						if (size & 1)
+							size++;		// RIFF chunks are word aligned.
+						bufferOffset += size;
+					}
 				}
 			}
 
