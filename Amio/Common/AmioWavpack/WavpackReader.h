@@ -49,6 +49,9 @@ namespace amio
 		asdk::int32 GetChannelMask() const;
 
 		///
+		void WavpackReader::GetChannelIdentities(asdk::uint8 *identities) const;
+
+		///
 		asdk::int32 GetBitRate() const;		// In the returned bitrate, 1000 bits per second is considered 1 kbps.
 
 		///

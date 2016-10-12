@@ -133,7 +133,7 @@ namespace amio
 			BufferSizeReset(0);
 			mExpectedSeekPosition = 0;
 			mRiffMetadataItems.clear();
-			for (int n = 0; n < mTagMetadataItems.size(); ++n) delete mTagMetadataItems[n].mData;
+			for (int n = 0; n < (int) mTagMetadataItems.size(); ++n) delete mTagMetadataItems[n].mData;
 			mTagMetadataItems.clear();
 		}
 
@@ -372,6 +372,12 @@ namespace amio
 		}
 
 		///
+		void GetChannelIdentities (asdk::uint8 *Identities)
+		{
+			WavpackGetChannelIdentities (wpcx, Identities);
+		}
+
+		///
 		int GetRiffMetadataItemCount() const
 		{
 			return (int) mRiffMetadataItems.size();
@@ -474,6 +480,12 @@ namespace amio
 	asdk::int32 WavpackReader::GetChannelMask() const
 	{
 		return mImpl->mChannelMask;
+	}
+
+	///
+	void WavpackReader::GetChannelIdentities(asdk::uint8 *identities) const
+	{
+		mImpl->GetChannelIdentities (identities);
 	}
 
 	///

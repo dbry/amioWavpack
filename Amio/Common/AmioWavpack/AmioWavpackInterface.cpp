@@ -63,25 +63,58 @@ namespace
 		}
 	}
 
-    amio::AudioChannelLabel AmioChannelTable [] = {
-		amio::kAudioChannelLabel_FrontLeft,	            // SPEAKER_FRONT_LEFT
-		amio::kAudioChannelLabel_FrontRight,	        // SPEAKER_FRONT_RIGHT
-		amio::kAudioChannelLabel_FrontCenter,	        // SPEAKER_FRONT_CENTER	
-		amio::kAudioChannelLabel_LowFrequency,	        // SPEAKER_LOW_FREQUENCY
-		amio::kAudioChannelLabel_BackLeft,	            // SPEAKER_BACK_LEFT
-		amio::kAudioChannelLabel_BackRight,	            // SPEAKER_BACK_RIGHT
-		amio::kAudioChannelLabel_FrontLeftOfCenter,	    // SPEAKER_FRONT_LEFT_OF_CENTER	
-		amio::kAudioChannelLabel_FrontRightOfCenter,	// SPEAKER_FRONT_RIGHT_OF_CENTER
-		amio::kAudioChannelLabel_BackCenter,	        // SPEAKER_BACK_CENTER
-		amio::kAudioChannelLabel_SideLeft,	            // SPEAKER_SIDE_LEFT
-		amio::kAudioChannelLabel_SideRight,	            // SPEAKER_SIDE_RIGHT
-		amio::kAudioChannelLabel_TopCenter,	            // SPEAKER_TOP_CENTER
-		amio::kAudioChannelLabel_TopFrontLeft,	        // SPEAKER_TOP_FRONT_LEFT
-		amio::kAudioChannelLabel_TopFrontCenter,	    // SPEAKER_TOP_FRONT_CENTER	
-		amio::kAudioChannelLabel_TopFrontRight,	        // SPEAKER_TOP_FRONT_RIGHT
-		amio::kAudioChannelLabel_TopBackLeft,	        // SPEAKER_TOP_BACK_LEFT
-		amio::kAudioChannelLabel_TopBackCenter,	        // SPEAKER_TOP_BACK_CENTER
-		amio::kAudioChannelLabel_TopBackRight,	        // SPEAKER_TOP_BACK_RIGHT
+	// This table maps the Amio channel identifiers (100-142) to the matching WavPack channel identifiers
+	// (which, for those channels that exist in Core Audio, match the Core Audio values). Note that the
+	// first 18 are the Microsoft "standard" channels, BUT ARE NOT IN MICROSOFT ORDER! Amio channels
+	// 127-128 and 138-142 do not have a corresponding Core Audio number, so we use the Amio values.
+
+    unsigned char AmioChannelTable [] = {
+    // WavPack  amio::AudioChannelLabel                            WAVEFORMATEXTENSIBLE             Apple CoreAudio                                      VST 3
+    // -------  -------------------------------------              -----------------------------    -----------------------------------------------      ----------------------
+        1,      // kAudioChannelLabel_FrontLeft           = 100,   SPEAKER_FRONT_LEFT               kAudioChannelLabel_Left                    = 1,      kSpeakerL
+        2,      // kAudioChannelLabel_FrontRight          = 101,   SPEAKER_FRONT_RIGHT              kAudioChannelLabel_Right                   = 2,      kSpeakerR
+        3,      // kAudioChannelLabel_FrontCenter         = 102,   SPEAKER_FRONT_CENTER             kAudioChannelLabel_Center                  = 3,      kSpeakerC
+        4,      // kAudioChannelLabel_LowFrequency        = 103,   SPEAKER_LOW_FREQUENCY            kAudioChannelLabel_LFEScreen               = 4,      kSpeakerLfe
+        5,      // kAudioChannelLabel_BackLeft            = 104,   SPEAKER_BACK_LEFT                kAudioChannelLabel_LeftSurround            = 5,      kSpeakerLs
+        6,      // kAudioChannelLabel_BackRight           = 105,   SPEAKER_BACK_RIGHT               kAudioChannelLabel_RightSurround           = 6,      kSpeakerRs      
+        9,      // kAudioChannelLabel_BackCenter          = 106,   SPEAKER_BACK_CENTER              kAudioChannelLabel_CenterSurround          = 9,      kSpeakerCs = kSpeakerS
+        7,      // kAudioChannelLabel_FrontLeftOfCenter   = 107,   SPEAKER_FRONT_LEFT_OF_CENTER     kAudioChannelLabel_LeftCenter              = 7,      kSpeakerLc
+        8,      // kAudioChannelLabel_FrontRightOfCenter  = 108,   SPEAKER_FRONT_RIGHT_OF_CENTER    kAudioChannelLabel_RightCenter             = 8,      kSpeakerRc
+        10,     // kAudioChannelLabel_SideLeft            = 109,   SPEAKER_SIDE_LEFT                kAudioChannelLabel_LeftSurroundDirect      = 10,     kSpeakerSl
+        11,     // kAudioChannelLabel_SideRight           = 110,   SPEAKER_SIDE_RIGHT               kAudioChannelLabel_RightSurroundDirect     = 11,     kSpeakerSr
+        12,     // kAudioChannelLabel_TopCenter           = 111,   SPEAKER_TOP_CENTER               kAudioChannelLabel_TopCenterSurround       = 12,     kSpeakerTm
+        13,     // kAudioChannelLabel_TopFrontLeft        = 112,   SPEAKER_TOP_FRONT_LEFT           kAudioChannelLabel_VerticalHeightLeft      = 13,     kSpeakerTfl
+        15,     // kAudioChannelLabel_TopFrontRight       = 113,   SPEAKER_TOP_FRONT_RIGHT          kAudioChannelLabel_VerticalHeightRight     = 15,     kSpeakerTfr
+        14,     // kAudioChannelLabel_TopFrontCenter      = 114,   SPEAKER_TOP_FRONT_CENTER         kAudioChannelLabel_VerticalHeightCenter    = 14,     kSpeakerTfc
+        16,     // kAudioChannelLabel_TopBackLeft         = 115,   SPEAKER_TOP_BACK_LEFT            kAudioChannelLabel_TopBackLeft             = 16,     kSpeakerTrl
+        18,     // kAudioChannelLabel_TopBackRight        = 116,   SPEAKER_TOP_BACK_RIGHT           kAudioChannelLabel_TopBackRight            = 18,     kSpeakerTrr
+        17,     // kAudioChannelLabel_TopBackCenter       = 117,   SPEAKER_TOP_BACK_CENTER          kAudioChannelLabel_TopBackCenter           = 17,     kSpeakerTrc
+
+        35,     // kAudioChannelLabel_FrontLeftWide       = 118,                                    kAudioChannelLabel_LeftWide                = 35
+        36,     // kAudioChannelLabel_FrontRightWide      = 119,                                    kAudioChannelLabel_RightWide               = 36
+        255,    // Reserved - DO NOT USE                  = 120-126
+        255,
+        255,
+        255,
+        255,
+        255,
+        255,
+        127,    // kAudioChannelLabel_LeftHeight          = 127,                                                                                         kSpeakerTsl
+        128,    // kAudioChannelLabel_RightHeight         = 128,                                                                                         kSpeakerTsr
+        33,     // kAudioChannelLabel_RearSurroundLeft    = 129,                                    kAudioChannelLabel_RearSurroundLeft        = 33,     kSpeakerLcs
+        34,     // kAudioChannelLabel_RearSurroundRight   = 130,                                    kAudioChannelLabel_RearSurroundRight       = 34,     kSpeakerRcs
+        37,     // kAudioChannelLabel_LFE2                = 131,                                    kAudioChannelLabel_LFE2                    = 37,     kSpeakerLfe2
+        38,     // kAudioChannelLabel_LeftTotal           = 132,                                    kAudioChannelLabel_LeftTotal               = 38,
+        39,     // kAudioChannelLabel_RightTotal          = 133,                                    kAudioChannelLabel_RightTotal              = 39,
+        200,    // kAudioChannelLabel_Ambisonic_W         = 134,                                    kAudioChannelLabel_Ambisonic_W             = 200,    kSpeakerW
+        201,    // kAudioChannelLabel_Ambisonic_X         = 135,                                    kAudioChannelLabel_Ambisonic_X             = 201,    kSpeakerX
+        202,    // kAudioChannelLabel_Ambisonic_Y         = 136,                                    kAudioChannelLabel_Ambisonic_Y             = 202,    kSpeakerY
+        203,    // kAudioChannelLabel_Ambisonic_Z         = 137,                                    kAudioChannelLabel_Ambisonic_Z             = 203,    kSpeakerZ
+        138,    // kAudioChannelLabel_BottomFrontLeft     = 138,                                                                                         kSpeakerBfl
+        139,    // kAudioChannelLabel_BottomFrontCenter   = 139,                                                                                         kSpeakerBfc
+        140,    // kAudioChannelLabel_BottomFrontRight    = 140,                                                                                         kSpeakerBfr
+        141,    // kAudioChannelLabel_ProximityLeft       = 141,
+        142,    // kAudioChannelLabel_ProximityRight      = 142,
     };
 
     #define NUM_AMIO_CHANNELS (sizeof (AmioChannelTable) / sizeof (AmioChannelTable [0]))
@@ -239,23 +272,29 @@ protected:
         int channelCount = inReadFile.GetNumChannels();
         asdk::int32 channelMask = inReadFile.GetChannelMask();
 
-        for (int i = 0; i < channelCount && channelAssignment < NUM_AMIO_CHANNELS;) {
-//          char assign_string [80];
+		// with the new WavpackGetChannelIdentities(), obtaining channel information is easy
 
-            if (!channelMask) {
-//              sprintf (assign_string, "SetSpeakerAssignment (%d, %d)\n", i, kAudioChannelLabel_Discrete);
-//              OutputDebugStringA (assign_string);
-                inFormat.SetSpeakerAssignment (i++, kAudioChannelLabel_Discrete);
-            }
-            else if (channelMask & 1) {
-//              sprintf (assign_string, "SetSpeakerAssignment (%d, %d)\n", i, AmioChannelTable [channelAssignment]);
-//              OutputDebugStringA (assign_string);
-                inFormat.SetSpeakerAssignment (i++, AmioChannelTable [channelAssignment]);
-            }
+		unsigned char *channel_identities = new unsigned char [channelCount+1];
+		inReadFile.GetChannelIdentities (channel_identities);
 
-            channelMask >>= 1;
-            channelAssignment++;
-        }
+		for (int i = 0; i < channelCount; ++i) {
+			if (channel_identities [i] == 255)
+                inFormat.SetSpeakerAssignment (i, kAudioChannelLabel_Discrete);
+			else {
+				int j;
+
+				for (j = 0; j < NUM_AMIO_CHANNELS; ++j)
+					if (channel_identities [i] == AmioChannelTable [j]) {
+						inFormat.SetSpeakerAssignment (i, (amio::AudioChannelLabel) (kAudioChannelLabel_FrontLeft + j));
+						break;
+					}
+
+				if (j == NUM_AMIO_CHANNELS)
+					inFormat.SetSpeakerAssignment (i, kAudioChannelLabel_Discrete);
+			}
+		}
+
+		delete [] channel_identities;
 
 		// Set our private settings.
 		AmioWavpackPrivateSettings privateSettings;
@@ -570,21 +609,27 @@ protected:
         // and create the channelMask that we will use
 
         for (i = 0; i < numChannels; ++i) {
-//          char msg [80];
+            char msg [80];
             AudioChannelLabel speaker = amioFormat.GetSpeakerAssignment (i);
-//          sprintf (msg, "GetSpeakerAssignment (%d) = %d\n", i, speaker);
-//          OutputDebugStringA (msg);
+            sprintf (msg, "GetSpeakerAssignment (%d) = %d\n", i, speaker);
+            OutputDebugStringA (msg);
 
-            for (int j = 0; j < NUM_AMIO_CHANNELS; j++)
-                if (speaker == AmioChannelTable [j] && !(channelMask & (1 << j))) {
-                    channelMask |= 1 << j;
-                    definedChannels++;
-                    break;
-                }
+			if (speaker >= kAudioChannelLabel_FrontLeft && speaker <= kAudioChannelLabel_TopBackCenter) {
+				unsigned int mask_bit = 1 << (AmioChannelTable [speaker - kAudioChannelLabel_FrontLeft] - 1);
+
+				if (!(channelMask & mask_bit)) {
+					channelMask |= mask_bit;
+					definedChannels++;
+				}
+			}
         }
 
-        // This array will specify the destination position for each of the input channels
+        // These arrays will specify the destination position for each of the input channels,
+		// and the final identities of the [possibly] re-ordered channels. Note that the
+		// definedChannels that we counted above come first (channel-mask, first-occurrence),
+		// then any others (duplicates and non-channel-mask) come after that.
 
+		unsigned char *channelIdentities = new unsigned char [numChannels+1];
         unsigned char *channelOrder = new unsigned char [numChannels];
         int channelMask2ndPass = 0;
 
@@ -592,34 +637,44 @@ protected:
 
         for (i = 0; i < numChannels; ++i) {
             AudioChannelLabel speaker = amioFormat.GetSpeakerAssignment (i);
-            int j;
 
-            for (j = 0; j < NUM_AMIO_CHANNELS; j++)
-                if (speaker == AmioChannelTable [j] && !(channelMask2ndPass & (1 << j))) {
-                    channelMask2ndPass |= 1 << j;
+			if (speaker >= kAudioChannelLabel_FrontLeft && speaker <= kAudioChannelLabel_TopBackCenter) {
+				unsigned int mask_bit = 1 << (AmioChannelTable [speaker - kAudioChannelLabel_FrontLeft] - 1);
+
+				// channel is Microsoft, but make sure it's not a duplicate
+
+				if (channelMask2ndPass & mask_bit) {
+					channelIdentities [definedChannels] = AmioChannelTable [speaker - kAudioChannelLabel_FrontLeft];
+					channelOrder [i] = definedChannels++;
+				}
+				else {
+					channelMask2ndPass |= mask_bit;		// this is to detect duplicates
                     channelOrder [i] = 0;
 
-                    // determine where the defined channel will go by counting up the defined channels
-                    // that exist and that must come before it
-
-                    for (int k = 0; k < j; ++k)
-                        if (channelMask & (1 << k))
+					while (mask_bit >>= 1)				// count earlier masked channels to determine order
+						if (channelMask & mask_bit)
                             channelOrder [i]++;
 
-                    break;
-                }
+					// now we know where it's going, so we can store the identity
+					channelIdentities [channelOrder [i]] = AmioChannelTable [speaker - kAudioChannelLabel_FrontLeft];
+				}
+			}
+			else {	// channel is non-Microsoft, so we know it's going at the end with the "undefind's"
+				if (speaker < kAudioChannelLabel_FrontLeft + NUM_AMIO_CHANNELS)
+					channelIdentities [definedChannels] = AmioChannelTable [speaker - kAudioChannelLabel_FrontLeft];
+				else
+					channelIdentities [definedChannels] = 255;	// outside of our table (really should not happen)
 
-            // undefined channels (non-channelMask and duplicates) come after the defined channels
-
-            if (j == NUM_AMIO_CHANNELS)
-                channelOrder [i] = definedChannels++;
-
-//          char msg [80];
-//          sprintf (msg, "channelOrder [%d] = %d\n", i, channelOrder [i]);
-//          OutputDebugStringA (msg);
+				channelOrder [i] = definedChannels++;
+			}
         }
 
-        // Finally, if there's actually no re-oredering to do (vast majority of cases), then pass a NULL
+		if (definedChannels != numChannels)
+			OutputDebugStringA ("*** definedChannels != numChannels ***\n");
+
+		channelIdentities [definedChannels] = 0;	// channelIdentities is NULL terminated
+
+        // Finally, if there's actually no re-ordering to do (vast majority of cases), then pass a NULL
         // array to Initialize() so we don't waste a lot of time doing nothing.
 
         for (i = 0; i < numChannels; ++i)
@@ -629,10 +684,10 @@ protected:
         if (i == numChannels) {
             delete [] channelOrder;
             channelOrder = NULL;
-            OutputDebugStringA ("channels are NOT being re-ordered in WavPack write\n");
+            OutputDebugStringA ("WriteStart: channels are NOT being re-ordered\n");
         }
         else
-            OutputDebugStringA ("channels ARE being re-ordered in WavPack write\n");
+            OutputDebugStringA ("WriteStart: channels ARE being re-ordered\n");
 
 		WavpackWriter::ExtendedError extError;
 		WavpackWriter *theFile = new WavpackWriter;
@@ -641,7 +696,7 @@ protected:
 			numChannels,
 			bytesPerSample,
 			amioFormat.GetSampleTotal(),
-			channelMask, channelOrder,
+			channelMask, channelIdentities, channelOrder,
             privateSettings.GetCompressionLevel (),
 			extError))
                 {
@@ -656,7 +711,8 @@ protected:
                 }
 
         delete theFile;
-        delete [] channelOrder;
+        delete [] channelIdentities;
+        if (channelOrder) delete [] channelOrder;
 
 		amio::UTF16String errorText;
 		switch (extError)
@@ -794,7 +850,7 @@ protected:
 
 				// read the metadata and pad it with a zero byte (for odd riff sizes)
 
-				char *metadataBuffer = new char [metadataSize + 1];
+				char *metadataBuffer = new char [(unsigned int) metadataSize + 1];
 				inFormat.GetMetadataItem (metadataIndex, metadataBuffer, 0, metadataSize);
 				metadataBuffer [metadataSize] = 0;
 
