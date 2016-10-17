@@ -1,9 +1,9 @@
-AmioWavpack - WavPack File Input/Output Plugin for Adobe Audition
-=================================================================
+AmioWavpack - Input/Output Plugin for Adobe Audition
+====================================================
 
-These plugins are based on
+This plugin is based on
 the amioSDK provided by Adobe. The latest version of the amioSDK and
-its EULA are located at the link below, and it it important that
+its EULA are located at the link below, and it is important that
 you read the EULA before downloading this project. The WavPack-specific
 code, and the resulting plugins, are licensed under the 3-clause BSD.
 
@@ -12,9 +12,8 @@ code, and the resulting plugins, are licensed under the 3-clause BSD.
 Note that the SDK comes with a Monkey's Audio plugin sample and the required Monkey's
 Audio library, and that this project was based on that sample. However, all Monkey's Audio
 references have been deleted and replaced with WavPack in this repository (although some of
-the original sample code was not modified). Many
-thanks to the Audition team for making this SDK available to me early on and
-for incorporating some of my suggestions.
+the original sample code was not modified). Many thanks to the Audition team for making this
+SDK available to me early on and for incorporating some of my suggestions.
 
 ## Features
 
@@ -39,6 +38,3 @@ are both 32-bit and 64-bit versions of the project. The 32-bit version is for Au
 ## Download
 
 The latest releases of the plugins can be found on [the WavPack downloads page](http://www.wavpack.com/downloads.html).
-
-
-
