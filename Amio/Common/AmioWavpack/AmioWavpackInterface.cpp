@@ -244,8 +244,15 @@ protected:
 
 		amioOpen.SetAudioFormatDescriptionString(formatDescription.c_str()); 
 		amioOpen.SetAudioBitrate(bitRate);
+
+        if (reader->GetNumChannels() <= 8)
+            amioOpen.SetFileFlags(kAmioFileFlag_XmpSupportThroughPluginOnly |
+                                  kAmioFileFlag_ReadSamplesRaw |
+                                  kAmioFileFlag_RealTimeSupport);
+        else
+			amioOpen.SetFileFlags(kAmioFileFlag_XmpSupportThroughPluginOnly);
+
 		amioOpen.SetSessionState(reader.release());
-		amioOpen.SetFileFlags(kAmioFileFlag_XmpSupportThroughPluginOnly);
 		return kAmioInterfaceReturnCode_Success;
 	}
 
@@ -386,6 +393,18 @@ protected:
 		}
 		inReadInterface.SetReturnedSampleCount(samplesDesired);
 		return kAmioInterfaceReturnCode_Success;
+	}
+
+	///
+	virtual AmioResult ReadSamplesRaw(WavpackReader& inReadFile,
+		asdk::int64 inStartOffset,
+		asdk::int64 inByteCount,
+		void *inDestinationBuffer)
+	{
+        if (inReadFile.ReadSamplesRaw (inStartOffset, inByteCount, inDestinationBuffer))
+            return kAmioInterfaceReturnCode_Success;
+        else
+            return kAmioInterfaceReturnCode_DecoderError;
 	}
 
 	///
@@ -701,7 +720,14 @@ protected:
 			extError))
                 {
                     // These things must be set because when doing a save as, Audition will display and use this information just as if the file were freshly opened.
-                    inWriteStart.SetFileFlags(amio::kAmioFileFlag_XmpSupportThroughPluginOnly | amio::kAmioFileFlag_WriteXmpMetadataBeforeSamples);
+					if (numChannels <= 8)
+						inWriteStart.SetFileFlags(amio::kAmioFileFlag_XmpSupportThroughPluginOnly |
+							amio::kAmioFileFlag_ReadSamplesRaw |
+							amio::kAmioFileFlag_RealTimeSupport |
+							amio::kAmioFileFlag_WriteXmpMetadataBeforeSamples);
+					else
+						inWriteStart.SetFileFlags(amio::kAmioFileFlag_XmpSupportThroughPluginOnly | amio::kAmioFileFlag_WriteXmpMetadataBeforeSamples);
+
                     amio::UTF16String formatDescription = amio::utils::AsciiToUTF16("WavPack ") + privateSettings.GetCompressionQualityString();
                     inWriteStart.SetAudioFormatDescriptionString(formatDescription.c_str());
 

@@ -68,6 +68,9 @@ namespace amio
 		/// Get deinterleaved samples for the zero-based inChannelIndex.
 		bool ReadSamples(asdk::int64 inStartSample, asdk::int32 inSampleCount, asdk::int32 inChannelIndex, void *inBuffer);
 
+		/// Get raw interleaved samples.
+		bool ReadSamplesRaw(asdk::int64 inStartByteOffset, asdk::int64 inByteCount, void *inBuffer);
+
 		///
 		/// Reading Metadata
 		///

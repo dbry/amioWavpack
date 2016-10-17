@@ -56,6 +56,27 @@ namespace
 		}
 	}
 
+	///
+	void DeinterleaveWithOffset(const asdk::int32* inSrc, void* inDest,
+			asdk::int32 bytesPerSample, asdk::int32 byteCount, asdk::int32 byteOffset)
+	{
+		const asdk::int32* src = inSrc;
+		asdk::uint8* dest = reinterpret_cast<asdk::uint8*>(inDest);
+
+		while (byteOffset >= bytesPerSample) {
+			byteOffset -= bytesPerSample;
+			src++;
+		}
+
+		while (byteCount--) {
+			*dest++ = static_cast<asdk::uint8>(*src >> (byteOffset << 3));
+			if (++byteOffset == bytesPerSample) {
+				byteOffset = 0;
+				src++;
+			}
+		}
+	}
+
 	// This structure describes an item of tag metadata found in the media file (from an APEv2 tag).
 	struct TagMetadataItem
 	{
@@ -350,9 +371,119 @@ namespace amio
 		}
 
 		///
+		bool ReadSamplesRaw(asdk::int64 inStartByteOffset, asdk::int64 inByteCount, void *inBuffer)
+        {
+            // int start_ticks = GetTickCount();
+            int bytesPerFrame = mBytesPerSample * mChannels;
+            asdk::int64 inStartSample, inSampleCount;
+			bool aligned_request;
+            char str [256];
+
+			// In theory, this API could get requests that are not aligned to sample boundaries. I have not seen this
+			// happen, and in fact all requests except at EOF seem to be for 61440 bytes which is evenly divisible by
+			// all possible sample sizes (1-4), but I could not get confirmation from Adobe that this cannot happen,
+			// so we have to handle it. What can and does happen is that we can get requests that don't align on a
+			// frame, which we handle fine, but which can cause an extra seek because some samples get read twice and
+			// we don't check for overlapped requests. We should handle this more efficiently, but it only happens
+			// with some odd channel configurations like 3 channels at 24-bits, or 7 channels, and so I'll deal with
+			// it later.
+
+            inStartSample = inStartByteOffset / bytesPerFrame;
+            inSampleCount = ((inStartByteOffset + inByteCount + bytesPerFrame - 1) / bytesPerFrame) - inStartSample;
+            aligned_request = !(inStartByteOffset % bytesPerFrame) && !(inByteCount % bytesPerFrame);
+
+			// If the entire requested portion is not in our buffer, reallocate and decode
+			if (inStartSample < mInterleavedBufferSampleStart || 
+				(inStartSample + inSampleCount) > (mInterleavedBufferSampleStart + mInterleavedBufferSampleBlocksValid))
+			{
+
+#if 0	// check for overlapped requests...if these happen then we could be wasting
+		// time doing extras seeks and sample decoding, but I haven't seen them except
+		// in the edge case mentioned above (3 24-bit channels, etc)
+
+				asdk::int64 current_sample = mInterleavedBufferSampleStart, sample_count = mInterleavedBufferSampleBlocksValid;
+				int overlap_samples = 0;
+
+				while (sample_count--) {
+					if (current_sample >= inStartSample && current_sample < inStartSample + inSampleCount)
+						overlap_samples++;
+
+					current_sample++;
+				}
+
+				if (overlap_samples) {
+					sprintf (str, "WavpackReader::ReadSamplesRaw(): %d / %d samples overlap\n", overlap_samples, (int) inSampleCount);
+					OutputDebugStringA (str);
+				}
+#endif
+
+				if (!BufferSizeReset((int)(inSampleCount * mChannels * 4)))
+				{
+					return false;
+				}
+				if (inStartSample != mExpectedSeekPosition)
+				{
+                    // OutputDebugStringA ("**** WavpackReader::ReadSamplesRaw(): calling WavpackSeekSample() ****\n");
+					if (!WavpackSeekSample (wpcx, static_cast<int>(static_cast<asdk::uint32>(inStartSample))))
+                        OutputDebugStringA ("**** WavpackReader::ReadSamplesRaw(): WavpackSeekSample() failed!! ****\n");
+				}
+
+				int blocksRead = WavpackUnpackSamples (wpcx, reinterpret_cast<int32_t*>(mInterleavedBuffer.get ()),
+                    static_cast<asdk::uint32>(inSampleCount));
+
+				if (blocksRead != inSampleCount)
+				{
+                    sprintf (str, "WavpackReader::ReadSamplesRaw() read incomplete buffer, requested %lld, got %d\n",
+                        inSampleCount, blocksRead);
+                    OutputDebugStringA (str);
+					return false;
+				}
+				mExpectedSeekPosition = inStartSample + inSampleCount;
+				mInterleavedBufferSampleStart = inStartSample;
+				mInterleavedBufferSampleBlocksValid = (asdk::int32)inSampleCount;
+			}
+
+			// optimized code for aligned requests; more general code for unaligned requests (which don't happen...yet)
+
+			if (aligned_request) {
+				int sampleOffsetIntoBuffer = static_cast<int>((inStartByteOffset - (mInterleavedBufferSampleStart * bytesPerFrame)) / mBytesPerSample);
+				switch (mBytesPerSample)
+				{
+				case 1: 
+					DeInterleave<asdk::uint8>(reinterpret_cast<asdk::int32*>(mInterleavedBuffer.get()) + sampleOffsetIntoBuffer, 
+							static_cast<asdk::uint8*>(inBuffer), static_cast<asdk::int32>(inByteCount / mBytesPerSample), 1, 128);
+					break;
+				case 2:
+					DeInterleave<asdk::int16>(reinterpret_cast<asdk::int32*>(mInterleavedBuffer.get()) + sampleOffsetIntoBuffer, 
+							static_cast<asdk::int16*>(inBuffer), static_cast<asdk::int32>(inByteCount / mBytesPerSample), 1);
+					break;
+				case 3:
+					Deinterleave24Bits(reinterpret_cast<asdk::int32*>(mInterleavedBuffer.get()) + sampleOffsetIntoBuffer, 
+							static_cast<asdk::uint8*>(inBuffer), static_cast<asdk::int32>(inByteCount / mBytesPerSample), 1);
+					break;
+				case 4:
+					DeInterleave<asdk::int32>(reinterpret_cast<asdk::int32*>(mInterleavedBuffer.get()) + sampleOffsetIntoBuffer, 
+							static_cast<asdk::int32*>(inBuffer), static_cast<asdk::int32>(inByteCount / mBytesPerSample), 1);
+					break;
+				}
+			}
+			else {
+				int byteOffsetIntoBuffer = static_cast<int>(inStartByteOffset - (mInterleavedBufferSampleStart * bytesPerFrame));
+
+				DeinterleaveWithOffset(reinterpret_cast<asdk::int32*>(mInterleavedBuffer.get()), 
+						inBuffer, mBytesPerSample, static_cast<asdk::int32>(inByteCount), byteOffsetIntoBuffer);
+			}
+
+            // sprintf (str, "    WavpackReader::ReadSamplesRaw(): took %d msecs\n", GetTickCount() - start_ticks);
+            // OutputDebugStringA (str);
+            return true;
+        }
+
+		///
 		bool BufferSizeReset(int inNewSize)
 		{
-			if (inNewSize < mInterleavedBufferSizeInBytes)
+			// Oops...this used to be just "<" which meant we were reallocating all the time (probably not as intended)
+			if (inNewSize <= mInterleavedBufferSizeInBytes)
 			{
 				return true;	// Just use the existing size.
 			}
@@ -517,6 +648,32 @@ namespace amio
 	bool WavpackReader::ReadSamples(asdk::int64 inStartSample, asdk::int32 inSampleCount, asdk::int32 inChannelIndex, void *inBuffer)
 	{
 		return mImpl->ReadSamples(inStartSample, inSampleCount, inChannelIndex, inBuffer);
+	}
+
+    /// Get raw interleaved samples.
+	bool WavpackReader::ReadSamplesRaw(asdk::int64 inStartByteOffset, asdk::int64 inByteCount, void *inBuffer)
+	{
+#if 0	// this is a torture-test for the raw read API that splits all requests into two,
+		// potentially sample-unaligned, reads (don't leave this on in production!)
+		static asdk::uint32 random = 0x31415926;
+		asdk::uint32 split;
+
+		random = ((random << 4) - random) ^ 1;
+		random = ((random << 4) - random) ^ 1;
+		split = random = ((random << 4) - random) ^ 1;
+
+		while (split > inByteCount)
+			split >>= 1;
+
+		if (random & 0x80000000)
+			return mImpl->ReadSamplesRaw(inStartByteOffset+split, inByteCount-split, (char*)inBuffer+split) &&
+				mImpl->ReadSamplesRaw(inStartByteOffset, split, inBuffer);
+		else
+			return mImpl->ReadSamplesRaw(inStartByteOffset, split, inBuffer) &&
+				   mImpl->ReadSamplesRaw(inStartByteOffset+split, inByteCount-split, (char*)inBuffer+split);
+#else
+		return mImpl->ReadSamplesRaw(inStartByteOffset, inByteCount, inBuffer);
+#endif
 	}
 
 	///
