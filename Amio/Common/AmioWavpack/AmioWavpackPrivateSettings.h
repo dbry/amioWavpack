@@ -22,18 +22,6 @@ namespace amio
 	public:
 		AmioWavpackPrivateSettings();
 
-		enum CompressionIndex
-		{
-			kCompressionIndex_Fast = 0,
-			kCompressionIndex_Normal = 1,
-			kCompressionIndex_High = 2, 
-			kCompressionIndex_ExtraHigh = 3,
-			kCompressionIndex_Insane = 4,
-			kCompressionIndex_Count = 5,
-			kCompressionIndex_Default = kCompressionIndex_Normal
-		};
-		static int GetCompressionLevel(CompressionIndex inCompressionIndex);
-
 		//
 		// Settings that pertain only to our file format.
 		//
@@ -41,9 +29,11 @@ namespace amio
 
 		int GetCompressionLevel() const;
 
-		int GetCompressionLevelIndex() const;
-
 		amio::UTF16String GetCompressionQualityString() const;	// A human-readable expression of the quality.
+
+		void SetHybridBitrate(int inBitrate);
+
+		int GetHybridBitrate() const;
 
 		double GetEstimatedCompressionFactor() const;
 
@@ -56,6 +46,7 @@ namespace amio
 	protected:
 		void					SetDefaults();
 		int						mCompressionLevel;
+		int						mHybridBitrate;
 	};
 } // namespace amio
 

@@ -67,24 +67,21 @@ namespace
 			CenterDialog(hDlg);
 			
 			int radioToCheck = IDC_RADIO2;
-			switch (gRadioIndexCompressionLevel)
+			switch (gRadioIndexCompressionLevel / 1000)
 			{
-			case 0:
+			case 1:
 				radioToCheck = IDC_RADIO1;
 				break;
 			default:
-			case 1:
+			case 2:
 				radioToCheck = IDC_RADIO2;
 				break;
-			case 2:
+			case 3:
 				radioToCheck = IDC_RADIO3;
 				break;
-			case 3:
+			case 4:
 				radioToCheck = IDC_RADIO4;
 				break;
-//			case 4:
-//				radioToCheck = IDC_RADIO5;
-//				break;
 			}
 			CheckRadioButton(hDlg, IDC_RADIO1, IDC_RADIO4, radioToCheck);
 			return TRUE;
@@ -101,15 +98,13 @@ namespace
 				if (cmd == BN_CLICKED)
 				{
 					if (IsDlgButtonChecked(hDlg, IDC_RADIO1))
-						gRadioIndexCompressionLevel = 0;
+						gRadioIndexCompressionLevel = 1000;
 					else if (IsDlgButtonChecked(hDlg, IDC_RADIO2))
-						gRadioIndexCompressionLevel = 1;
+						gRadioIndexCompressionLevel = 2000;
 					else if (IsDlgButtonChecked(hDlg, IDC_RADIO3))
-						gRadioIndexCompressionLevel = 2;
+						gRadioIndexCompressionLevel = 3000;
 					else if (IsDlgButtonChecked(hDlg, IDC_RADIO4))
-						gRadioIndexCompressionLevel = 3;
-//					else if (IsDlgButtonChecked(hDlg, IDC_RADIO5))
-//						gRadioIndexCompressionLevel = 4;
+						gRadioIndexCompressionLevel = 4000;
 					EndDialog(hDlg, item);
 					return TRUE;
 				}
@@ -148,7 +143,7 @@ namespace amio
 	///
 	bool AmioWavpackSettingsDialog::RunModal(PlatformWindow inPlatformWindow)
 	{
-		gRadioIndexCompressionLevel = mSettings.GetCompressionLevelIndex();
+		gRadioIndexCompressionLevel = mSettings.GetCompressionLevel();
 		INT_PTR nResult = DialogBoxParam(amio::gModuleInstance,
 								amio::utils::AsciiToUTF16("IDD_DIALOG_SETTINGS").c_str(),
 								inPlatformWindow,
@@ -156,9 +151,7 @@ namespace amio
 								NULL);
 		if (IDOK == nResult)
 		{
-			mSettings.SetCompressionLevel(
-					AmioWavpackPrivateSettings::GetCompressionLevel(
-					static_cast<AmioWavpackPrivateSettings::CompressionIndex>(gRadioIndexCompressionLevel)));
+			mSettings.SetCompressionLevel(gRadioIndexCompressionLevel);
 			return true;
 		}
 		return false;

@@ -237,11 +237,15 @@ protected:
 
 		asdk::int32 bitRate = reader->GetBitRate();
 		char asciiFormat[256];
-		sprintf(asciiFormat,"WavPack %s %ld kbps",
+		sprintf(asciiFormat,"WavPack %s Mode %ld kbps",
 			amio::utils::UTF16StringtoUTF8String(privateSettings.GetCompressionQualityString()).c_str(),
 			bitRate/1000);
 		amio::UTF16String formatDescription = amio::utils::AsciiToUTF16(asciiFormat);
 
+		char msg [256];
+		sprintf (msg, "OpenForRead(): format description = \"%s\"\n", asciiFormat);
+		OutputDebugStringA (msg);
+		
 		amioOpen.SetAudioFormatDescriptionString(formatDescription.c_str()); 
 		amioOpen.SetAudioBitrate(bitRate);
 
@@ -306,7 +310,13 @@ protected:
 		// Set our private settings.
 		AmioWavpackPrivateSettings privateSettings;
 		privateSettings.SetCompressionLevel(inReadFile.GetCompressionLevel());
+		privateSettings.SetHybridBitrate(inReadFile.GetHybridBitrate());
 		inFormat.SetPrivateFormatData(privateSettings.GetSerialized().c_str());
+
+		char msg [256];
+		amio::UTF8String privateString = amio::utils::UTF16StringtoUTF8String(privateSettings.GetSerialized());
+		sprintf (msg, "GetFormat(): private settings string = \"%s\"\n", privateString.c_str());
+		OutputDebugStringA (msg);
 
 		// Pass along information about the metadata we found in the file.
 		for (int metadataIndex = 0; metadataIndex < inReadFile.GetRiffMetadataItemCount(); metadataIndex++)
@@ -500,24 +510,24 @@ protected:
 		bool isGivenFormatOK = true;
 
 		int bytesPerSample = 0;
-		UTF16String sampleDepth;
+		char *sampleDepth;
 		switch (audioFormat.GetSampleType())
 		{
 		case kAudioSampleType_UInt8:
 			bytesPerSample = 1;
-			sampleDepth = amio::utils::AsciiToUTF16("8 bit");
+			sampleDepth = "8 bit";
 			break;
 		case kAudioSampleType_SInt16:
 			bytesPerSample = 2;
-			sampleDepth = amio::utils::AsciiToUTF16("16 bit");
+			sampleDepth = "16 bit";
 			break;
 		case kAudioSampleType_SInt24:
 			bytesPerSample = 3;
-			sampleDepth = amio::utils::AsciiToUTF16("24 bit");
+			sampleDepth = "24 bit";
 			break;
 		case kAudioSampleType_Float32:
 			bytesPerSample = 4;
-			sampleDepth = amio::utils::AsciiToUTF16("32 bit float");
+			sampleDepth = "32 bit float";
 			break;
 		default:
 			// Wavpack supports only 8, 16, and 24 bit integer and 32 bit float samples.
@@ -558,9 +568,21 @@ protected:
 
 		audioFormat.SetFileFlags(fileFlags);
 
-		amio::UTF16String desc = amio::utils::AsciiToUTF16("WavPack ") + sampleDepth + amio::utils::AsciiToUTF16("\n") + 
-				privateSettings.GetCompressionQualityString();
-					
+		asdk::int32 level = privateSettings.GetCompressionLevel ();
+		char desc_str [80];
+
+		if ((level % 1000) - (level % 100)) {
+			int bitrate_kbps = static_cast<int>((privateSettings.GetHybridBitrate() / 256.0 * audioFormat.GetSampleRate() *
+				audioFormat.GetChannelCount() / 1000.0) + 0.5);
+			sprintf (desc_str, "WavPack %s\n%s Mode\n%d kbps\n", sampleDepth,
+				amio::utils::UTF16StringtoUTF8String (privateSettings.GetCompressionQualityString()).c_str(),
+				bitrate_kbps);
+		}
+		else
+			sprintf (desc_str, "WavPack %s\n%s Mode\n", sampleDepth,
+				amio::utils::UTF16StringtoUTF8String (privateSettings.GetCompressionQualityString()).c_str());
+
+		amio::UTF16String desc = amio::utils::AsciiToUTF16(desc_str);
 		inSettingsInfo.SetSettingsDescriptionString(desc.c_str());
 
 		if (isGivenFormatOK || (inSettingsInfo.GetFixFormatParameter() != AmioGetExportSettingsInfoInterface::kFixFormatParameter_FixAll))
@@ -728,7 +750,8 @@ protected:
 					else
 						inWriteStart.SetFileFlags(amio::kAmioFileFlag_XmpSupportThroughPluginOnly | amio::kAmioFileFlag_WriteXmpMetadataBeforeSamples);
 
-                    amio::UTF16String formatDescription = amio::utils::AsciiToUTF16("WavPack ") + privateSettings.GetCompressionQualityString();
+                    amio::UTF16String formatDescription = amio::utils::AsciiToUTF16("WavPack ") + privateSettings.GetCompressionQualityString() +
+						amio::utils::AsciiToUTF16(" Mode");
                     inWriteStart.SetAudioFormatDescriptionString(formatDescription.c_str());
 
                     outWriteFile = theFile;

@@ -17,6 +17,7 @@
 namespace
 {
 	const amio::UTF16String kAttributeKey_CompressionLevel = amio::utils::AsciiToUTF16("CompressionLevel");
+	const amio::UTF16String kAttributeKey_HybridBitrate = amio::utils::AsciiToUTF16("HybridBitrate");
 
 } // private namespace
 
@@ -28,35 +29,11 @@ namespace amio
 		SetDefaults();
 	}
 
-	enum CompressionIndex
-	{
-		kCompressionIndex_Fast = 0,
-		kCompressionIndex_Normal = 1,
-		kCompressionIndex_High = 2, 
-		kCompressionIndex_VeryHigh = 3,
-		kCompressionIndex_Count = 4,
-		kCompressionIndex_Default = kCompressionIndex_Normal
-	};
-	int AmioWavpackPrivateSettings::GetCompressionLevel(CompressionIndex inCompressionIndex)
-	{
-		switch(inCompressionIndex)
-		{
-		case kCompressionIndex_Fast:
-			return 1000;
-		default:
-		case kCompressionIndex_Normal:
-			return 2000;
-		case kCompressionIndex_High:
-			return 3000;
-		case kCompressionIndex_VeryHigh:
-			return 4000;
-		}
-	}
-
 	///
 	void AmioWavpackPrivateSettings::SetDefaults()
 	{
-		mCompressionLevel = GetCompressionLevel(kCompressionIndex_Default);
+		mCompressionLevel = 2000;	// "normal" compression
+		mHybridBitrate = 972;		// 3.8 bits/sample (* 256)
 	}
 
 	///
@@ -72,32 +49,48 @@ namespace amio
 	}
 
 	///
-	int AmioWavpackPrivateSettings::GetCompressionLevelIndex() const
+	int AmioWavpackPrivateSettings::GetHybridBitrate() const
 	{
-		if (mCompressionLevel <= GetCompressionLevel(kCompressionIndex_Fast))
-			return kCompressionIndex_Fast;
-		if (mCompressionLevel <= GetCompressionLevel(kCompressionIndex_Normal))
-			return kCompressionIndex_Normal;
-		if (mCompressionLevel <= GetCompressionLevel(kCompressionIndex_High))
-			return kCompressionIndex_High;
-        return kCompressionIndex_VeryHigh;
+		return mHybridBitrate;
+	}
+
+	///
+	void AmioWavpackPrivateSettings::SetHybridBitrate(int inBitrate)
+	{
+		mHybridBitrate = inBitrate;
 	}
 
 	/// A human-readable expression of the quality.
 	amio::UTF16String AmioWavpackPrivateSettings::GetCompressionQualityString() const
 	{
-		switch (GetCompressionLevelIndex())
-		{
-		case kCompressionIndex_Fast:
-			return amio::utils::AsciiToUTF16("Fast Compression");
-		default:
-		case kCompressionIndex_Normal:
-			return amio::utils::AsciiToUTF16("Normal Compression");
-		case kCompressionIndex_High:
-			return amio::utils::AsciiToUTF16("High Compression");
-		case kCompressionIndex_VeryHigh:
-			return amio::utils::AsciiToUTF16("Very High Compression");
+		asdk::int32 level = GetCompressionLevel ();
+		amio::UTF16String ret_string;
+
+		if ((level % 1000) - (level % 100)) {
+			if ((level % 100) - (level % 10))
+				ret_string = amio::utils::AsciiToUTF16("Hybrid Lossless");
+			else
+				ret_string = amio::utils::AsciiToUTF16("Hybrid Lossy");
 		}
+		else
+			ret_string = amio::utils::AsciiToUTF16("Lossless");
+
+		switch (level / 1000)
+		{
+		case 1:
+			ret_string += amio::utils::AsciiToUTF16(" Fast");
+			break;
+
+		case 3:
+			ret_string += amio::utils::AsciiToUTF16(" High");
+			break;
+
+		case 4:
+			ret_string += amio::utils::AsciiToUTF16(" Very High");
+			break;
+		}
+
+		return ret_string;
 	}
 
 	///
@@ -105,13 +98,13 @@ namespace amio
 	{
 		const double conservativeAdjustment = 1.125;
 
-		switch (GetCompressionLevelIndex())
+		switch (GetCompressionLevel() / 1000)
 		{
-		case kCompressionIndex_Fast:			return 0.569 * conservativeAdjustment;
+		case 1:			return 0.569 * conservativeAdjustment;
 		default:							
-		case kCompressionIndex_Normal:			return 0.545 * conservativeAdjustment;
-		case kCompressionIndex_High:			return 0.536 * conservativeAdjustment;
-		case kCompressionIndex_VeryHigh:		return 0.527 * conservativeAdjustment;
+		case 2:			return 0.545 * conservativeAdjustment;
+		case 3:			return 0.536 * conservativeAdjustment;
+		case 4:			return 0.527 * conservativeAdjustment;
 		}
 	}
 
@@ -121,6 +114,7 @@ namespace amio
 		AmioPrivateSettingsSerializer serializer;
 
 		serializer.AddAttribute(kAttributeKey_CompressionLevel, static_cast<asdk::int32>(GetCompressionLevel()));
+		if (GetHybridBitrate()) serializer.AddAttribute(kAttributeKey_HybridBitrate, static_cast<asdk::int32>(GetHybridBitrate()));
 		amio::UTF16String ret = serializer.GetSerializedString();
 		return ret;
 	}
@@ -136,6 +130,10 @@ namespace amio
 		if (serializer.QueryAttribute(kAttributeKey_CompressionLevel, iValue))
 		{
 			SetCompressionLevel(iValue);
+		}
+		if (serializer.QueryAttribute(kAttributeKey_HybridBitrate, iValue))
+		{
+			SetHybridBitrate(iValue);
 		}
 		return true;
 	}

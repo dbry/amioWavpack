@@ -55,6 +55,9 @@ namespace amio
 		asdk::int32 GetBitRate() const;		// In the returned bitrate, 1000 bits per second is considered 1 kbps.
 
 		///
+		asdk::int32 GetHybridBitrate() const;		// Hybrid bitrate in bits/sample * 256, otherwise 0
+
+		///
 		asdk::int32 GetCompressionLevel() const;
 
 		///

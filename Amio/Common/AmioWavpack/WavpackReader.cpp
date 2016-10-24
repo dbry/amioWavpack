@@ -124,7 +124,6 @@ namespace amio
 			, mSampleRate(0)
 			, mChannels(0)
 			, mBytesPerSample(0)
-			, mAverageBitRate(0)
 			, mSampleCount(0)
 			, mInterleavedBufferSizeInBytes(0)
 			, mInterleavedBufferSampleStart(0)
@@ -197,7 +196,6 @@ namespace amio
 			}
 			mChannels = WavpackGetNumChannels (wpcx);
             mChannelMask = WavpackGetChannelMask (wpcx);
-			mAverageBitRate = static_cast<int>(WavpackGetAverageBitrate (wpcx, 1)); 
 			mSampleCount = WavpackGetNumSamples64 (wpcx); 
 
             WavpackSeekTrailingWrapper (wpcx);
@@ -509,6 +507,21 @@ namespace amio
 		}
 
 		///
+		asdk::int32 GetBitRate() const
+		{
+			return static_cast<int>(WavpackGetAverageBitrate (wpcx, 1));
+		}
+
+		///
+		asdk::int32 GetHybridBitrate() const
+		{
+			if (mMode & MODE_HYBRID)
+				return static_cast<int>(256.0 * WavpackGetAverageBitrate (wpcx, 0) / mChannels / mSampleRate + 0.5);
+			else
+				return 0;
+		}
+
+		///
 		int GetRiffMetadataItemCount() const
 		{
 			return (int) mRiffMetadataItems.size();
@@ -566,7 +579,6 @@ namespace amio
 		int				mChannels;
 		asdk::int32		mChannelMask;
 		int				mBytesPerSample;
-		int				mAverageBitRate;
 		asdk::int64		mSampleCount;
 		int				mMetadataSize;
 	};
@@ -622,20 +634,35 @@ namespace amio
 	///
 	asdk::int32 WavpackReader::GetBitRate() const
 	{
-		return mImpl->mAverageBitRate;
+		return mImpl->GetBitRate ();
+	}
+
+	///
+	asdk::int32 WavpackReader::GetHybridBitrate() const
+	{
+		return mImpl->GetHybridBitrate ();
 	}
 
 	///
 	asdk::int32 WavpackReader::GetCompressionLevel() const
 	{
+		asdk::int32 ret_value = 2000;
+
         if (mImpl->mMode & MODE_FAST)
-            return 1000;
+            ret_value = 1000;
         else if (mImpl->mMode & MODE_VERY_HIGH)
-            return 4000;
+            ret_value = 4000;
         else if (mImpl->mMode & MODE_HIGH)
-            return 3000;
-        else
-            return 2000;
+            ret_value = 3000;
+
+		if (mImpl->mMode & MODE_HYBRID) {
+			ret_value += 100;
+
+			if (mImpl->mMode & MODE_LOSSLESS)
+				ret_value += 10;
+		}
+
+		return ret_value;
 	}
 
 	///
