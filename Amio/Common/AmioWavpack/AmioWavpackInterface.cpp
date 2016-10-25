@@ -576,7 +576,7 @@ protected:
 				audioFormat.GetChannelCount() / 1000.0) + 0.5);
 			sprintf (desc_str, "WavPack %s\n%s Mode\n%d kbps\n", sampleDepth,
 				amio::utils::UTF16StringtoUTF8String (privateSettings.GetCompressionQualityString()).c_str(),
-				bitrate_kbps);
+				privateSettings.nearestStandardBitrate (bitrate_kbps));
 		}
 		else
 			sprintf (desc_str, "WavPack %s\n%s Mode\n", sampleDepth,

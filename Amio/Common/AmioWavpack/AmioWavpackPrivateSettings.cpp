@@ -138,4 +138,27 @@ namespace amio
 		return true;
 	}
 
+	//
+	// handy utilities not specifically WavPack related
+	//
+
+	bool AmioWavpackPrivateSettings::standardBitrate (int bitrate) const
+	{
+		int sd, sc = 0;
+
+		for (sd = bitrate; sd > 7; sd >>= 1)
+			sc++;
+
+		return bitrate == sd << sc;
+	}
+
+	int AmioWavpackPrivateSettings::nearestStandardBitrate (int bitrate) const
+	{
+        for (int delta = 1; ; delta++)
+            if (standardBitrate (bitrate - delta))
+                return bitrate - delta;
+            else if (standardBitrate (bitrate + delta))
+                return bitrate + delta;
+	}
+
 } // namespace amio

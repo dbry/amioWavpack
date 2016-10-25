@@ -43,6 +43,13 @@ namespace amio
 		amio::UTF16String GetSerialized() const;
 		bool InitializeFromSerialized(const amio::UTF16String& inSettings);
 
+		//
+		// handy utilities not specifically WavPack related
+		//
+
+		bool standardBitrate (int bitrate) const;
+		int nearestStandardBitrate (int bitrate) const;
+
 	protected:
 		void					SetDefaults();
 		int						mCompressionLevel;

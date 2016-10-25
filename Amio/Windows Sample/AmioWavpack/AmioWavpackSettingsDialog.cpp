@@ -14,6 +14,7 @@
 #include "AmioModule.h"
 #include "AmioUtilities.h"
 #include "resource.h"
+#include <commctrl.h>
 
 namespace
 {
@@ -64,26 +65,46 @@ namespace
 		{
 		case  WM_INITDIALOG:
 		{
+			int hybrid_mode = (gRadioIndexCompressionLevel % 1000) - (gRadioIndexCompressionLevel % 100);
+			int wvc_mode = (gRadioIndexCompressionLevel % 100) - (gRadioIndexCompressionLevel % 10);
 			CenterDialog(hDlg);
 			
-			int radioToCheck = IDC_RADIO2;
+            EnableWindow (GetDlgItem (hDlg, IDC_BITRATE), hybrid_mode);
+            EnableWindow (GetDlgItem (hDlg, IDC_BITRATE_TEXT), hybrid_mode);
+            EnableWindow (GetDlgItem (hDlg, IDC_CORRECTION), hybrid_mode);
+
+            EnableWindow (GetDlgItem (hDlg, IDC_FLOAT20), FALSE);
+            EnableWindow (GetDlgItem (hDlg, IDC_FLOAT24), FALSE);
+            EnableWindow (GetDlgItem (hDlg, IDC_FLOAT32), FALSE);
+            EnableWindow (GetDlgItem (hDlg, IDC_NOISESHAPE), FALSE);
+            EnableWindow (GetDlgItem (hDlg, IDC_DITHER), FALSE);
+            EnableWindow (GetDlgItem (hDlg, IDC_NORMALIZE), FALSE);
+
+			int radioToCheck = IDC_LOSSLESS;
 			switch (gRadioIndexCompressionLevel / 1000)
 			{
 			case 1:
-				radioToCheck = IDC_RADIO1;
+				radioToCheck = hybrid_mode ? IDC_HYBRID_FAST : IDC_LOSSLESS_FAST;
 				break;
 			default:
 			case 2:
-				radioToCheck = IDC_RADIO2;
+				radioToCheck = hybrid_mode ? IDC_HYBRID : IDC_LOSSLESS;
 				break;
 			case 3:
-				radioToCheck = IDC_RADIO3;
+				radioToCheck = hybrid_mode ? IDC_HYBRID_HIGH : IDC_LOSSLESS_HIGH;
 				break;
 			case 4:
-				radioToCheck = IDC_RADIO4;
+				radioToCheck = hybrid_mode ? IDC_HYBRID_VHIGH : IDC_LOSSLESS_VHIGH;
 				break;
 			}
-			CheckRadioButton(hDlg, IDC_RADIO1, IDC_RADIO4, radioToCheck);
+
+			CheckRadioButton(hDlg, IDC_LOSSLESS, IDC_HYBRID_FAST, radioToCheck);
+            CheckDlgButton (hDlg, IDC_CORRECTION, wvc_mode);
+
+            SendDlgItemMessage (hDlg, IDC_EXTRA_SLIDER, TBM_SETRANGE, 0, MAKELONG (0, 6));
+            SendDlgItemMessage (hDlg, IDC_EXTRA_SLIDER, TBM_SETPOS, 1, gRadioIndexCompressionLevel % 10);
+
+            SetFocus (GetDlgItem (hDlg, radioToCheck));
 			return TRUE;
 		}
 
@@ -94,17 +115,50 @@ namespace
 
 			switch  (item)
 			{
+			case IDC_LOSSLESS: case IDC_LOSSLESS_HIGH: case IDC_LOSSLESS_VHIGH: case IDC_LOSSLESS_FAST:
+				if (cmd == BN_CLICKED)
+				{
+                    EnableWindow (GetDlgItem (hDlg, IDC_BITRATE), FALSE);
+                    EnableWindow (GetDlgItem (hDlg, IDC_BITRATE_TEXT), FALSE);
+                    EnableWindow (GetDlgItem (hDlg, IDC_CORRECTION), FALSE);
+                    break;
+				}
+			case IDC_HYBRID: case IDC_HYBRID_HIGH: case IDC_HYBRID_VHIGH: case IDC_HYBRID_FAST:
+				if (cmd == BN_CLICKED)
+				{
+                    EnableWindow (GetDlgItem (hDlg, IDC_BITRATE), TRUE);
+                    EnableWindow (GetDlgItem (hDlg, IDC_BITRATE_TEXT), TRUE);
+                    EnableWindow (GetDlgItem (hDlg, IDC_CORRECTION), TRUE);
+                    break;
+				}
 			case IDOK:
 				if (cmd == BN_CLICKED)
 				{
-					if (IsDlgButtonChecked(hDlg, IDC_RADIO1))
+					if (IsDlgButtonChecked(hDlg, IDC_LOSSLESS_FAST))
 						gRadioIndexCompressionLevel = 1000;
-					else if (IsDlgButtonChecked(hDlg, IDC_RADIO2))
+					else if (IsDlgButtonChecked(hDlg, IDC_LOSSLESS))
 						gRadioIndexCompressionLevel = 2000;
-					else if (IsDlgButtonChecked(hDlg, IDC_RADIO3))
+					else if (IsDlgButtonChecked(hDlg, IDC_LOSSLESS_HIGH))
 						gRadioIndexCompressionLevel = 3000;
-					else if (IsDlgButtonChecked(hDlg, IDC_RADIO4))
+					else if (IsDlgButtonChecked(hDlg, IDC_LOSSLESS_VHIGH))
 						gRadioIndexCompressionLevel = 4000;
+					else if (IsDlgButtonChecked(hDlg, IDC_HYBRID_FAST))
+						gRadioIndexCompressionLevel = 1100;
+					else if (IsDlgButtonChecked(hDlg, IDC_HYBRID))
+						gRadioIndexCompressionLevel = 2100;
+					else if (IsDlgButtonChecked(hDlg, IDC_HYBRID_HIGH))
+						gRadioIndexCompressionLevel = 3100;
+					else if (IsDlgButtonChecked(hDlg, IDC_HYBRID_VHIGH))
+						gRadioIndexCompressionLevel = 4100;
+
+					if (IsDlgButtonChecked(hDlg, IDC_CORRECTION))
+						gRadioIndexCompressionLevel += 10;
+
+                    int i = SendDlgItemMessage (hDlg, IDC_EXTRA_SLIDER, TBM_GETPOS, 0, 0);
+
+                    if (i >= 0 && i <= 6)
+						gRadioIndexCompressionLevel += i;
+
 					EndDialog(hDlg, item);
 					return TRUE;
 				}
@@ -113,6 +167,14 @@ namespace
 				{
 					EndDialog(hDlg, item);
 					return TRUE;
+				}
+			case IDABOUT:
+				if (cmd == BN_CLICKED)
+				{
+					MessageBox (hDlg,
+						L"WavPack Plugin Version 2.0\n"
+						L"Copyright (c) 2016 David Bryant  ", L"About WavPack Plugin", MB_OK);
+					break;
 				}
 			}
 		}
