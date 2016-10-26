@@ -513,12 +513,12 @@ namespace amio
 		}
 
 		///
-		asdk::int32 GetHybridBitrate() const
+		double GetHybridBitsPerSample() const
 		{
 			if (mMode & MODE_HYBRID)
-				return static_cast<int>(256.0 * WavpackGetAverageBitrate (wpcx, 0) / mChannels / mSampleRate + 0.5);
+				return WavpackGetAverageBitrate (wpcx, 0) / mChannels / mSampleRate;
 			else
-				return 0;
+				return 0.0;
 		}
 
 		///
@@ -638,13 +638,13 @@ namespace amio
 	}
 
 	///
-	asdk::int32 WavpackReader::GetHybridBitrate() const
+	double WavpackReader::GetHybridBitsPerSample() const
 	{
-		return mImpl->GetHybridBitrate ();
+		return mImpl->GetHybridBitsPerSample ();
 	}
 
 	///
-	asdk::int32 WavpackReader::GetCompressionLevel() const
+	asdk::int32 WavpackReader::GetCompressionMode() const
 	{
 		asdk::int32 ret_value = 2000;
 

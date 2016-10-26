@@ -233,12 +233,12 @@ protected:
 		}
 
 		AmioWavpackPrivateSettings privateSettings;
-		privateSettings.SetCompressionLevel(reader->GetCompressionLevel());
+		privateSettings.SetCompressionMode(reader->GetCompressionMode());
 
 		asdk::int32 bitRate = reader->GetBitRate();
 		char asciiFormat[256];
 		sprintf(asciiFormat,"WavPack %s Mode %ld kbps",
-			amio::utils::UTF16StringtoUTF8String(privateSettings.GetCompressionQualityString()).c_str(),
+			amio::utils::UTF16StringtoUTF8String(privateSettings.GetCompressionModeString()).c_str(),
 			bitRate/1000);
 		amio::UTF16String formatDescription = amio::utils::AsciiToUTF16(asciiFormat);
 
@@ -309,8 +309,13 @@ protected:
 
 		// Set our private settings.
 		AmioWavpackPrivateSettings privateSettings;
-		privateSettings.SetCompressionLevel(inReadFile.GetCompressionLevel());
-		privateSettings.SetHybridBitrate(inReadFile.GetHybridBitrate());
+		privateSettings.SetTotalSamplesPerSecond(inFormat.GetChannelCount() * inFormat.GetSampleRate());
+		privateSettings.SetCompressionMode(inReadFile.GetCompressionMode());
+		privateSettings.SetHybridBitsPerSample(inReadFile.GetHybridBitsPerSample());
+
+		// snap hybrid bitrate to a standard rate for this sample rate and number of channels
+		privateSettings.SetCurrentBitrate(privateSettings.nearestStandardBitrate(privateSettings.GetCurrentBitrate()));
+
 		inFormat.SetPrivateFormatData(privateSettings.GetSerialized().c_str());
 
 		char msg [256];
@@ -504,6 +509,7 @@ protected:
 
 		AmioFormatInterface& audioFormat = inSettingsInfo.GetFormat();
 		AmioWavpackPrivateSettings privateSettings;
+		privateSettings.SetTotalSamplesPerSecond(audioFormat.GetChannelCount() * audioFormat.GetSampleRate());
 		amio::UTF16String privateSettingsString(audioFormat.GetPrivateFormatData());
 		privateSettings.InitializeFromSerialized(privateSettingsString);
 
@@ -568,19 +574,17 @@ protected:
 
 		audioFormat.SetFileFlags(fileFlags);
 
-		asdk::int32 level = privateSettings.GetCompressionLevel ();
-		char desc_str [80];
+		asdk::int32 mode = privateSettings.GetCompressionMode ();
+		char desc_str [256];
 
-		if ((level % 1000) - (level % 100)) {
-			int bitrate_kbps = static_cast<int>((privateSettings.GetHybridBitrate() / 256.0 * audioFormat.GetSampleRate() *
-				audioFormat.GetChannelCount() / 1000.0) + 0.5);
-			sprintf (desc_str, "WavPack %s\n%s Mode\n%d kbps\n", sampleDepth,
-				amio::utils::UTF16StringtoUTF8String (privateSettings.GetCompressionQualityString()).c_str(),
-				privateSettings.nearestStandardBitrate (bitrate_kbps));
-		}
-		else
-			sprintf (desc_str, "WavPack %s\n%s Mode\n", sampleDepth,
-				amio::utils::UTF16StringtoUTF8String (privateSettings.GetCompressionQualityString()).c_str());
+		sprintf (desc_str, "WavPack %s\n%s Mode\n", sampleDepth,
+			amio::utils::UTF16StringtoUTF8String (privateSettings.GetCompressionModeString()).c_str());
+
+		if (mode % 10)
+			sprintf (desc_str + strlen (desc_str), "Extra Processing Level %d\n", mode % 10);
+
+		if ((mode % 1000) - (mode % 100))
+			sprintf (desc_str + strlen (desc_str), "%d kbps\n", privateSettings.GetCurrentBitrate());
 
 		amio::UTF16String desc = amio::utils::AsciiToUTF16(desc_str);
 		inSettingsInfo.SetSettingsDescriptionString(desc.c_str());
@@ -598,6 +602,7 @@ protected:
 	virtual AmioResult RunExportSettingsDialog(AmioFormatInterface& inFormat, void* inParentWindow, asdk::int64 inFlags, bool &outCancelled)
 	{
 		AmioWavpackPrivateSettings privateSettings;
+		privateSettings.SetTotalSamplesPerSecond(inFormat.GetChannelCount() * inFormat.GetSampleRate());
 		amio::UTF16String privateSettingsString(inFormat.GetPrivateFormatData());
 		privateSettings.InitializeFromSerialized(privateSettingsString);
 
@@ -738,7 +743,7 @@ protected:
 			bytesPerSample,
 			amioFormat.GetSampleTotal(),
 			channelMask, channelIdentities, channelOrder,
-            privateSettings.GetCompressionLevel (),
+            privateSettings.GetCompressionMode (),
 			extError))
                 {
                     // These things must be set because when doing a save as, Audition will display and use this information just as if the file were freshly opened.
@@ -750,7 +755,7 @@ protected:
 					else
 						inWriteStart.SetFileFlags(amio::kAmioFileFlag_XmpSupportThroughPluginOnly | amio::kAmioFileFlag_WriteXmpMetadataBeforeSamples);
 
-                    amio::UTF16String formatDescription = amio::utils::AsciiToUTF16("WavPack ") + privateSettings.GetCompressionQualityString() +
+                    amio::UTF16String formatDescription = amio::utils::AsciiToUTF16("WavPack ") + privateSettings.GetCompressionModeString() +
 						amio::utils::AsciiToUTF16(" Mode");
                     inWriteStart.SetAudioFormatDescriptionString(formatDescription.c_str());
 

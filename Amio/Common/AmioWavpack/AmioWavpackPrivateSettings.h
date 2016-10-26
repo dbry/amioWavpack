@@ -25,17 +25,29 @@ namespace amio
 		//
 		// Settings that pertain only to our file format.
 		//
-		void SetCompressionLevel(int inLevel);
+		void SetCompressionMode(int inMode);
 
-		int GetCompressionLevel() const;
+		int GetCompressionMode() const;
 
-		amio::UTF16String GetCompressionQualityString() const;	// A human-readable expression of the quality.
+		amio::UTF16String GetCompressionModeString() const;	// A human-readable expression of the mode.
 
-		void SetHybridBitrate(int inBitrate);
+		void SetHybridBitsPerSample(double inBitsPerSample);
 
-		int GetHybridBitrate() const;
+		double GetHybridBitsPerSample() const;
+
+		void SetTotalSamplesPerSecond(int inTotalSamplesPerSecond);
+
+		int GetTotalSamplesPerSecond() const;
 
 		double GetEstimatedCompressionFactor() const;
+
+		int GetMinimumBitrate() const;
+
+		int GetCurrentBitrate() const;
+
+		int GetMaximumBitrate() const;
+
+		void SetCurrentBitrate(int inBitrate);
 
 		//
 		// Transfer the format in a serialized form
@@ -47,13 +59,14 @@ namespace amio
 		// handy utilities not specifically WavPack related
 		//
 
-		bool standardBitrate (int bitrate) const;
+		bool isStandardBitrate (int bitrate) const;
 		int nearestStandardBitrate (int bitrate) const;
 
 	protected:
 		void					SetDefaults();
-		int						mCompressionLevel;
-		int						mHybridBitrate;
+		int						mCompressionMode;
+		double					mHybridBitsPerSample;
+		int						mTotalSamplesPerSecond;
 	};
 } // namespace amio
 

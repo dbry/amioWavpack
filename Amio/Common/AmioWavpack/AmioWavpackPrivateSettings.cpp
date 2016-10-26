@@ -16,8 +16,8 @@
 
 namespace
 {
-	const amio::UTF16String kAttributeKey_CompressionLevel = amio::utils::AsciiToUTF16("CompressionLevel");
-	const amio::UTF16String kAttributeKey_HybridBitrate = amio::utils::AsciiToUTF16("HybridBitrate");
+	const amio::UTF16String kAttributeKey_CompressionMode = amio::utils::AsciiToUTF16("CompressionMode");
+	const amio::UTF16String kAttributeKey_HybridBitsPerSample = amio::utils::AsciiToUTF16("HybridBitsPerSample");
 
 } // private namespace
 
@@ -32,38 +32,73 @@ namespace amio
 	///
 	void AmioWavpackPrivateSettings::SetDefaults()
 	{
-		mCompressionLevel = 2000;	// "normal" compression
-		mHybridBitrate = 972;		// 3.8 bits/sample (* 256)
+		mCompressionMode = 2000;		// "normal" lossless compression
+		mHybridBitsPerSample = 3.8;		// 3.8 bits/sample
 	}
 
 	///
-	void AmioWavpackPrivateSettings::SetCompressionLevel(int inLevel)
+	void AmioWavpackPrivateSettings::SetCompressionMode(int inMode)
 	{
-		mCompressionLevel = inLevel;
+		mCompressionMode = inMode;
 	}
 
 	///
-	int AmioWavpackPrivateSettings::GetCompressionLevel() const
+	int AmioWavpackPrivateSettings::GetCompressionMode() const
 	{
-		return mCompressionLevel;
+		return mCompressionMode;
 	}
 
 	///
-	int AmioWavpackPrivateSettings::GetHybridBitrate() const
+	double AmioWavpackPrivateSettings::GetHybridBitsPerSample() const
 	{
-		return mHybridBitrate;
+		return mHybridBitsPerSample;
 	}
 
 	///
-	void AmioWavpackPrivateSettings::SetHybridBitrate(int inBitrate)
+	void AmioWavpackPrivateSettings::SetHybridBitsPerSample(double inBitsPerSample)
 	{
-		mHybridBitrate = inBitrate;
+		if (inBitsPerSample != 0.0)
+			mHybridBitsPerSample = inBitsPerSample;
 	}
 
-	/// A human-readable expression of the quality.
-	amio::UTF16String AmioWavpackPrivateSettings::GetCompressionQualityString() const
+	///
+	void AmioWavpackPrivateSettings::SetCurrentBitrate(int inBitrate)
 	{
-		asdk::int32 level = GetCompressionLevel ();
+		if (inBitrate)
+			mHybridBitsPerSample = inBitrate * 1000.0 / mTotalSamplesPerSecond;
+	}
+
+	///
+	int AmioWavpackPrivateSettings::GetTotalSamplesPerSecond() const
+	{
+		return mTotalSamplesPerSecond;
+	}
+
+	///
+	void AmioWavpackPrivateSettings::SetTotalSamplesPerSecond(int inTotalSamplesPerSecond)
+	{
+		mTotalSamplesPerSecond = inTotalSamplesPerSecond;
+	}
+
+	int AmioWavpackPrivateSettings::GetMinimumBitrate() const
+	{
+		return (mTotalSamplesPerSecond + 225) / 450;	// 2.22 bits/sample
+	}
+
+	int AmioWavpackPrivateSettings::GetCurrentBitrate() const
+	{
+		return static_cast<int>(mTotalSamplesPerSecond * mHybridBitsPerSample / 1000.0 + 0.5);
+	}
+
+	int AmioWavpackPrivateSettings::GetMaximumBitrate() const
+	{
+		return (mTotalSamplesPerSecond + 45) / 90;		// 11.11 bits/sample
+	}
+
+	/// A human-readable expression of the mode, e.g. "Hybrid Lossy Fast" or "Lossless"
+	amio::UTF16String AmioWavpackPrivateSettings::GetCompressionModeString() const
+	{
+		asdk::int32 level = GetCompressionMode ();
 		amio::UTF16String ret_string;
 
 		if ((level % 1000) - (level % 100)) {
@@ -98,7 +133,7 @@ namespace amio
 	{
 		const double conservativeAdjustment = 1.125;
 
-		switch (GetCompressionLevel() / 1000)
+		switch (GetCompressionMode() / 1000)
 		{
 		case 1:			return 0.569 * conservativeAdjustment;
 		default:							
@@ -113,8 +148,8 @@ namespace amio
 	{
 		AmioPrivateSettingsSerializer serializer;
 
-		serializer.AddAttribute(kAttributeKey_CompressionLevel, static_cast<asdk::int32>(GetCompressionLevel()));
-		if (GetHybridBitrate()) serializer.AddAttribute(kAttributeKey_HybridBitrate, static_cast<asdk::int32>(GetHybridBitrate()));
+		serializer.AddAttribute(kAttributeKey_CompressionMode, static_cast<asdk::int32>(GetCompressionMode()));
+		serializer.AddAttribute(kAttributeKey_HybridBitsPerSample, static_cast<asdk::int32>(GetHybridBitsPerSample() * 1000.0 + 0.5));
 		amio::UTF16String ret = serializer.GetSerializedString();
 		return ret;
 	}
@@ -127,13 +162,13 @@ namespace amio
 		serializer.Initialize(inSettings);
 
 		asdk::int32 iValue;
-		if (serializer.QueryAttribute(kAttributeKey_CompressionLevel, iValue))
+		if (serializer.QueryAttribute(kAttributeKey_CompressionMode, iValue))
 		{
-			SetCompressionLevel(iValue);
+			SetCompressionMode(iValue);
 		}
-		if (serializer.QueryAttribute(kAttributeKey_HybridBitrate, iValue))
+		if (serializer.QueryAttribute(kAttributeKey_HybridBitsPerSample, iValue))
 		{
-			SetHybridBitrate(iValue);
+			SetHybridBitsPerSample(iValue / 1000.0);
 		}
 		return true;
 	}
@@ -142,7 +177,7 @@ namespace amio
 	// handy utilities not specifically WavPack related
 	//
 
-	bool AmioWavpackPrivateSettings::standardBitrate (int bitrate) const
+	bool AmioWavpackPrivateSettings::isStandardBitrate (int bitrate) const
 	{
 		int sd, sc = 0;
 
@@ -155,9 +190,9 @@ namespace amio
 	int AmioWavpackPrivateSettings::nearestStandardBitrate (int bitrate) const
 	{
         for (int delta = 1; ; delta++)
-            if (standardBitrate (bitrate - delta))
+            if (isStandardBitrate (bitrate - delta))
                 return bitrate - delta;
-            else if (standardBitrate (bitrate + delta))
+            else if (isStandardBitrate (bitrate + delta))
                 return bitrate + delta;
 	}
 

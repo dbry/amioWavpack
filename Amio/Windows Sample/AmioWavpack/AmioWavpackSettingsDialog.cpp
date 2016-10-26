@@ -18,7 +18,7 @@
 
 namespace
 {
-	int gRadioIndexCompressionLevel = 0;
+	amio::AmioWavpackPrivateSettings *pSettings = NULL;
 
 	void CenterDialog(HWND hDlg)
 	{
@@ -61,12 +61,15 @@ namespace
 
 	INT_PTR WINAPI WavpackSettingsDialogProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 	{
+		amio::AmioWavpackPrivateSettings& mSettings = *pSettings;
+
 		switch (wMsg)
 		{
 		case  WM_INITDIALOG:
 		{
-			int hybrid_mode = (gRadioIndexCompressionLevel % 1000) - (gRadioIndexCompressionLevel % 100);
-			int wvc_mode = (gRadioIndexCompressionLevel % 100) - (gRadioIndexCompressionLevel % 10);
+			int mode = mSettings.GetCompressionMode();
+			int hybrid_mode = (mode % 1000) - (mode % 100);
+			int wvc_mode = (mode % 100) - (mode % 10);
 			CenterDialog(hDlg);
 			
             EnableWindow (GetDlgItem (hDlg, IDC_BITRATE), hybrid_mode);
@@ -81,7 +84,7 @@ namespace
             EnableWindow (GetDlgItem (hDlg, IDC_NORMALIZE), FALSE);
 
 			int radioToCheck = IDC_LOSSLESS;
-			switch (gRadioIndexCompressionLevel / 1000)
+			switch (mode / 1000)
 			{
 			case 1:
 				radioToCheck = hybrid_mode ? IDC_HYBRID_FAST : IDC_LOSSLESS_FAST;
@@ -102,7 +105,20 @@ namespace
             CheckDlgButton (hDlg, IDC_CORRECTION, wvc_mode);
 
             SendDlgItemMessage (hDlg, IDC_EXTRA_SLIDER, TBM_SETRANGE, 0, MAKELONG (0, 6));
-            SendDlgItemMessage (hDlg, IDC_EXTRA_SLIDER, TBM_SETPOS, 1, gRadioIndexCompressionLevel % 10);
+            SendDlgItemMessage (hDlg, IDC_EXTRA_SLIDER, TBM_SETPOS, 1, mode % 10);
+
+            SendDlgItemMessage (hDlg, IDC_BITRATE, CB_LIMITTEXT, 4, 0);
+
+			char str [16];
+			int br_max = mSettings.GetMaximumBitrate();
+            for (int i = mSettings.nearestStandardBitrate(mSettings.GetMinimumBitrate()); i <= br_max; ++i)
+                if (mSettings.isStandardBitrate (i)) {
+                    sprintf (str, "%d", i);
+                    SendDlgItemMessageA (hDlg, IDC_BITRATE, CB_ADDSTRING, 0, (long) str);
+                }
+
+            sprintf (str, "%d", mSettings.GetCurrentBitrate());
+            SetDlgItemTextA (hDlg, IDC_BITRATE, str);
 
             SetFocus (GetDlgItem (hDlg, radioToCheck));
 			return TRUE;
@@ -134,30 +150,41 @@ namespace
 			case IDOK:
 				if (cmd == BN_CLICKED)
 				{
+					int mode;
+
 					if (IsDlgButtonChecked(hDlg, IDC_LOSSLESS_FAST))
-						gRadioIndexCompressionLevel = 1000;
+						mode = 1000;
 					else if (IsDlgButtonChecked(hDlg, IDC_LOSSLESS))
-						gRadioIndexCompressionLevel = 2000;
+						mode = 2000;
 					else if (IsDlgButtonChecked(hDlg, IDC_LOSSLESS_HIGH))
-						gRadioIndexCompressionLevel = 3000;
+						mode = 3000;
 					else if (IsDlgButtonChecked(hDlg, IDC_LOSSLESS_VHIGH))
-						gRadioIndexCompressionLevel = 4000;
+						mode = 4000;
 					else if (IsDlgButtonChecked(hDlg, IDC_HYBRID_FAST))
-						gRadioIndexCompressionLevel = 1100;
+						mode = 1100;
 					else if (IsDlgButtonChecked(hDlg, IDC_HYBRID))
-						gRadioIndexCompressionLevel = 2100;
+						mode = 2100;
 					else if (IsDlgButtonChecked(hDlg, IDC_HYBRID_HIGH))
-						gRadioIndexCompressionLevel = 3100;
+						mode = 3100;
 					else if (IsDlgButtonChecked(hDlg, IDC_HYBRID_VHIGH))
-						gRadioIndexCompressionLevel = 4100;
+						mode = 4100;
 
 					if (IsDlgButtonChecked(hDlg, IDC_CORRECTION))
-						gRadioIndexCompressionLevel += 10;
+						mode += 10;
 
-                    int i = SendDlgItemMessage (hDlg, IDC_EXTRA_SLIDER, TBM_GETPOS, 0, 0);
+                    int i = (int) SendDlgItemMessage (hDlg, IDC_EXTRA_SLIDER, TBM_GETPOS, 0, 0);
 
                     if (i >= 0 && i <= 6)
-						gRadioIndexCompressionLevel += i;
+						mode += i;
+
+					mSettings.SetCompressionMode (mode);
+
+					char str [16];
+                    GetWindowTextA (GetDlgItem (hDlg, IDC_BITRATE), str, sizeof (str));
+					int new_br = atol (str);
+
+                    if (new_br && new_br != mSettings.GetCurrentBitrate() && new_br <= 9999)
+						mSettings.SetCurrentBitrate (new_br < mSettings.GetMinimumBitrate() ? mSettings.GetMinimumBitrate() : new_br);
 
 					EndDialog(hDlg, item);
 					return TRUE;
@@ -205,7 +232,7 @@ namespace amio
 	///
 	bool AmioWavpackSettingsDialog::RunModal(PlatformWindow inPlatformWindow)
 	{
-		gRadioIndexCompressionLevel = mSettings.GetCompressionLevel();
+		pSettings = &mSettings;
 		INT_PTR nResult = DialogBoxParam(amio::gModuleInstance,
 								amio::utils::AsciiToUTF16("IDD_DIALOG_SETTINGS").c_str(),
 								inPlatformWindow,
@@ -213,7 +240,6 @@ namespace amio
 								NULL);
 		if (IDOK == nResult)
 		{
-			mSettings.SetCompressionLevel(gRadioIndexCompressionLevel);
 			return true;
 		}
 		return false;
