@@ -43,7 +43,8 @@ namespace amio
 			asdk::int32 inChannelMask,
             unsigned char *inChannelIdentities,
             unsigned char *inChannelReorder,
-			asdk::int32 inCompressionLevel,
+			asdk::int32 inCompressionMode,
+			double inHybridBitsPerSample,
 			ExtendedError& outExtendedError);
 
 		///

@@ -309,7 +309,7 @@ protected:
 
 		// Set our private settings.
 		AmioWavpackPrivateSettings privateSettings;
-		privateSettings.SetTotalSamplesPerSecond(inFormat.GetChannelCount() * inFormat.GetSampleRate());
+		privateSettings.SetTotalSamplesPerSecond((int)inFormat.GetChannelCount() * inFormat.GetSampleRate());
 		privateSettings.SetCompressionMode(inReadFile.GetCompressionMode());
 		privateSettings.SetHybridBitsPerSample(inReadFile.GetHybridBitsPerSample());
 
@@ -509,7 +509,7 @@ protected:
 
 		AmioFormatInterface& audioFormat = inSettingsInfo.GetFormat();
 		AmioWavpackPrivateSettings privateSettings;
-		privateSettings.SetTotalSamplesPerSecond(audioFormat.GetChannelCount() * audioFormat.GetSampleRate());
+		privateSettings.SetTotalSamplesPerSecond((int)audioFormat.GetChannelCount() * audioFormat.GetSampleRate());
 		amio::UTF16String privateSettingsString(audioFormat.GetPrivateFormatData());
 		privateSettings.InitializeFromSerialized(privateSettingsString);
 
@@ -602,7 +602,7 @@ protected:
 	virtual AmioResult RunExportSettingsDialog(AmioFormatInterface& inFormat, void* inParentWindow, asdk::int64 inFlags, bool &outCancelled)
 	{
 		AmioWavpackPrivateSettings privateSettings;
-		privateSettings.SetTotalSamplesPerSecond(inFormat.GetChannelCount() * inFormat.GetSampleRate());
+		privateSettings.SetTotalSamplesPerSecond((int)inFormat.GetChannelCount() * inFormat.GetSampleRate());
 		amio::UTF16String privateSettingsString(inFormat.GetPrivateFormatData());
 		privateSettings.InitializeFromSerialized(privateSettingsString);
 
@@ -744,6 +744,7 @@ protected:
 			amioFormat.GetSampleTotal(),
 			channelMask, channelIdentities, channelOrder,
             privateSettings.GetCompressionMode (),
+            privateSettings.GetHybridBitsPerSample (),
 			extError))
                 {
                     // These things must be set because when doing a save as, Audition will display and use this information just as if the file were freshly opened.

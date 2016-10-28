@@ -135,8 +135,6 @@ namespace {
 
         delete [] temp;
     }
-
-// Verify the specified WavPack input file. This function uses the library
 } // private namespace
 
 namespace amio
@@ -195,39 +193,55 @@ namespace amio
 			asdk::int32 inChannelMask,
             unsigned char *inChannelIdentities,
             unsigned char *inChannelReorder,
-			asdk::int32 inCompressionLevel,
+			asdk::int32 inCompressionMode,
+			double inHybridBitsPerSample,
 			ExtendedError& outExtendedError)
 		{
+			if (((inCompressionMode % 1000) - (inCompressionMode % 100)) &&	// if hybrid and wvc check
+				((inCompressionMode % 100) - (inCompressionMode % 10))) {		// for tempfile use
+					int fni, fnlen = (int) inFileName.length();
+
+					for (fni = fnlen; fni > 0 && inFileName [fni-1] != '\\'; fni--);
+
+					if (fnlen-fni >= 7 && inFileName[fni]=='~' && inFileName[fni+1]=='$' && isdigit (inFileName[fnlen-4])) {
+						amio::UTF16String strippedFileName = inFileName;
+						strippedFileName.erase(fnlen-4,1);
+						strippedFileName.erase(fni,2);
+
+						if (ifstream (strippedFileName.c_str()).good()) {
+							OutputDebugStringA ("*** detected temporary file use ***\n");
+							wvcFinalName = strippedFileName + L"c";
+						}
+					}
+
+					wvcFileName = inFileName + L"c";
+			}
+
             wv_file = new write_helper;
 
             if (!wv_file->open (inFileName)) {
                 Close ();
                 return 1;
             }
-#if 0
-            char *cinFileName = new char [strlen (inFileName) + 2];
-            strcpy (cfname, inFileName);
-            strcat (cfname, "c");
-            wvc_file = new write_helper;
 
-            if (!wvc_file->open (cfname)) {
-                cout << "could not open output file " << cfname << endl;
-                delete cfname;
-                close ();
-                return 1;
-            }
+			if ((inCompressionMode % 1000) - (inCompressionMode % 100)) {		// if hybrid...
+				wpconfig.bitrate = (float) inHybridBitsPerSample;
+				wpconfig.flags |= CONFIG_HYBRID_FLAG;
 
-            delete cfname;
-#endif
+				if ((inCompressionMode % 100) - (inCompressionMode % 10)) {	// if wvc...
+					wpconfig.flags |= CONFIG_CREATE_WVC;
+					wvc_file = new write_helper;
+
+					if (!wvc_file->open (wvcFileName)) {
+						Close ();
+						return 1;
+					}
+				}
+			}
+
             wpcx = WavpackOpenFileOutput (write_block_cb, wv_file, wvc_file);
 
             wpconfig.num_channels = inNumChannels;
-#if 0
-            if (inNumChannels == 1)
-                wpconfig.channel_mask = 0x4;
-            else if (inNumChannels == 2)
-                wpconfig.channel_mask = 0x3;
-#endif
             wpconfig.channel_mask = inChannelMask;
 
             if (inChannelReorder) {
@@ -242,12 +256,17 @@ namespace amio
             if (inBytesPerSample == 4)
                 wpconfig.float_norm_exp = 127;
 
-            if (inCompressionLevel == 1000)
+            if (inCompressionMode / 1000 == 1)
                 wpconfig.flags |= CONFIG_FAST_FLAG;
-            else if (inCompressionLevel == 3000)
+            else if (inCompressionMode / 1000 == 3)
                 wpconfig.flags |= CONFIG_HIGH_FLAG;
-            else if (inCompressionLevel == 4000)
+            else if (inCompressionMode / 1000 == 4)
                 wpconfig.flags |= CONFIG_VERY_HIGH_FLAG;
+
+			if (inCompressionMode % 10) {										// if extra processing...
+				wpconfig.xmode = inCompressionMode % 10;
+				wpconfig.flags |= CONFIG_EXTRA_MODE;
+			}
 
             WavpackSetConfiguration64 (wpcx, &wpconfig, inSampleCount, inChannelIdentities);
             WavpackPackInit (wpcx);
@@ -329,6 +348,18 @@ namespace amio
             if (!wpcx)
                 return false;
 
+			if (inCancelMode) {
+				OutputDebugStringA ("*** WavpackWriter::FinishWrite() called with cancel!! ***\n");
+				Close ();
+
+				// attempt to delete the wvc file (if we were writing one)
+
+				if (wvcFileName.length())
+					_wunlink (wvcFileName.c_str());
+
+				return true;
+			}
+
             WavpackFlushSamples (wpcx);
             WavpackWriteTag (wpcx);
 
@@ -345,6 +376,20 @@ namespace amio
             }
 
 			Close();
+
+			// if we were writing a wvc file, and determined earlier that it must be a temporary file name
+			// (i.e., "~$something1.wvc") then we must do the rename/overwrite here (because Audition won't).
+
+			if (wvcFinalName.length()) {
+				OutputDebugStringA ("*** WavpackWriter::FinishWrite() renaming wvc file ***\n");
+				_wunlink (wvcFinalName.c_str());
+
+				if (ifstream (wvcFinalName.c_str()).good())
+					OutputDebugStringA ("*** could not delete wvc file to overwrite!! ***\n");
+				else if (_wrename (wvcFileName.c_str(), wvcFinalName.c_str()))
+					OutputDebugStringA ("*** error in renaming wvc file!! ***\n");
+			}
+
 			return true;
 		}
 
@@ -353,6 +398,7 @@ namespace amio
         write_helper *wv_file, *wvc_file;
         WavpackConfig wpconfig;
         asdk::int64 samples_requested, samples_written, riff_metadata;
+		amio::UTF16String wvcFileName, wvcFinalName;
         unsigned char *channel_reorder;
 
 	public:
@@ -383,7 +429,8 @@ namespace amio
 		asdk::int32 inChannelMask,
 		unsigned char *inChannelIdentities,
         unsigned char *inChannelReorder,
-		asdk::int32 inCompressionLevel,
+		asdk::int32 inCompressionMode,
+		double inHybridBitsPerSample,
 		ExtendedError& outExtendedError)
 	{
 		return mImpl->Initialize(inFileName, 
@@ -394,7 +441,8 @@ namespace amio
 			inChannelMask,
             inChannelIdentities,
             inChannelReorder,
-            inCompressionLevel,
+            inCompressionMode,
+			inHybridBitsPerSample,
 			outExtendedError);
 	}
 

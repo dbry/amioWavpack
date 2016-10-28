@@ -49,6 +49,8 @@ namespace amio
 
 		void SetCurrentBitrate(int inBitrate);
 
+		amio::UTF16String AmioWavpackPrivateSettings::GetWavpackLibraryVersion() const;
+
 		//
 		// Transfer the format in a serialized form
 		//

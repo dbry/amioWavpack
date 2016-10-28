@@ -14,6 +14,8 @@
 #include "AmioPrivateSettingsSerializer.h"
 #include "AmioUtilities.h"
 
+#include "../Wavpack/include/wavpack.h"		// for WavpackGetLibraryVersionString() only (no context)
+
 namespace
 {
 	const amio::UTF16String kAttributeKey_CompressionMode = amio::utils::AsciiToUTF16("CompressionMode");
@@ -40,6 +42,14 @@ namespace amio
 	void AmioWavpackPrivateSettings::SetCompressionMode(int inMode)
 	{
 		mCompressionMode = inMode;
+
+		// if not hybrid (i.e., lossless) then default the bitrate
+		if (!((mCompressionMode % 1000) - (mCompressionMode % 100)))
+			mHybridBitsPerSample = 3.8;		// 3.8 bits/sample
+
+		// if we know samples per second then refine bitrate to a "standard"
+		if (mTotalSamplesPerSecond)
+			SetCurrentBitrate (nearestStandardBitrate (GetCurrentBitrate()));
 	}
 
 	///
@@ -149,7 +159,8 @@ namespace amio
 		AmioPrivateSettingsSerializer serializer;
 
 		serializer.AddAttribute(kAttributeKey_CompressionMode, static_cast<asdk::int32>(GetCompressionMode()));
-		serializer.AddAttribute(kAttributeKey_HybridBitsPerSample, static_cast<asdk::int32>(GetHybridBitsPerSample() * 1000.0 + 0.5));
+		if ((mCompressionMode % 1000) - (mCompressionMode % 100))
+			serializer.AddAttribute(kAttributeKey_HybridBitsPerSample, static_cast<asdk::int32>(GetHybridBitsPerSample() * 1000.0 + 0.5));
 		amio::UTF16String ret = serializer.GetSerializedString();
 		return ret;
 	}
@@ -166,11 +177,18 @@ namespace amio
 		{
 			SetCompressionMode(iValue);
 		}
-		if (serializer.QueryAttribute(kAttributeKey_HybridBitsPerSample, iValue))
+		if ((mCompressionMode % 1000) - (mCompressionMode % 100) &&
+		    serializer.QueryAttribute(kAttributeKey_HybridBitsPerSample, iValue))
 		{
 			SetHybridBitsPerSample(iValue / 1000.0);
 		}
 		return true;
+	}
+
+	///
+	amio::UTF16String AmioWavpackPrivateSettings::GetWavpackLibraryVersion() const
+	{
+		return amio::utils::AsciiToUTF16 (WavpackGetLibraryVersionString ());
 	}
 
 	//
