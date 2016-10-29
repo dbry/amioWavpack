@@ -507,14 +507,16 @@ protected:
 	///
 	virtual AmioResult GetExportSettingsInfo(AmioGetExportSettingsInfoInterface& inSettingsInfo)
 	{
-		inSettingsInfo.SetHasExportSettingsDialog(true);
-		inSettingsInfo.SetIsLossy(false);
-
 		AmioFormatInterface& audioFormat = inSettingsInfo.GetFormat();
 		AmioWavpackPrivateSettings privateSettings;
 		privateSettings.SetTotalSamplesPerSecond((int)audioFormat.GetChannelCount() * audioFormat.GetSampleRate());
 		amio::UTF16String privateSettingsString(audioFormat.GetPrivateFormatData());
 		privateSettings.InitializeFromSerialized(privateSettingsString);
+		int mode = privateSettings.GetCompressionMode();
+
+		// if hybrid mode & not correction file, we're lossy
+		inSettingsInfo.SetIsLossy(((mode % 1000) - (mode % 100)) && !((mode % 100) - (mode % 10)));
+		inSettingsInfo.SetHasExportSettingsDialog(true);
 
 		bool isGivenFormatOK = true;
 
@@ -545,10 +547,11 @@ protected:
 			break;
 		}
 
-		asdk::int64 totalInputBytes = audioFormat.GetSampleTotal() * bytesPerSample * audioFormat.GetChannelCount();
-		double sizeFactorGuess = privateSettings.GetEstimatedCompressionFactor();
-		asdk::int64 estimatedSize = static_cast<asdk::int64>(sizeFactorGuess * totalInputBytes);
-		int tag_metadata_items = 0;
+		asdk::int64 totalInputSamples = audioFormat.GetSampleTotal() * audioFormat.GetChannelCount();
+		double bitsPerSampleGuess = privateSettings.GetEstimatedCompressionBitsPerSample(audioFormat.GetSampleType());
+		asdk::int64 estimatedSize = static_cast<asdk::int64>(bitsPerSampleGuess * totalInputSamples / 8.0);
+		asdk::int64 tagMetadataSize = 0;
+		int tagMetadataItems = 0;
 
 		// When estimating the size, take into consideration the metadata.
 		for(asdk::int32 metadataIndex = 0; metadataIndex < audioFormat.GetMetadataItemCount(); metadataIndex++)
@@ -559,24 +562,29 @@ protected:
 
 			if (audioFormat.GetMetadataItemInfo(metadataIndex, metadataTypeID, metadataSize, locationHint))
 			{
-				estimatedSize += metadataSize;
-
 				if (!strnicmp(kAmioMetadataTypeID_BinaryTagMetadataChunk, metadataTypeID.c_str(), metadataTypeID.size()) ||
-					!strnicmp(kAmioMetadataTypeID_TextTagMetadataChunk, metadataTypeID.c_str(), metadataTypeID.size()))
-						tag_metadata_items++;
+					!strnicmp(kAmioMetadataTypeID_TextTagMetadataChunk, metadataTypeID.c_str(), metadataTypeID.size())) {
+						tagMetadataSize += metadataSize;
+						tagMetadataItems++;
+				}
+				else
+					estimatedSize += metadataSize;
 			}
 		}
 
-		if (tag_metadata_items && !privateSettings.GetAppendApeTagsMode ()) {
+		if (tagMetadataItems && !privateSettings.GetAppendApeTagsMode ()) {
 			privateSettings.SetAppendApeTagsMode (1);		// 1 = tags present and write enabled
 			audioFormat.SetPrivateFormatData(privateSettings.GetSerialized().c_str());
 			isGivenFormatOK = false;
 		}
-		else if (!tag_metadata_items && privateSettings.GetAppendApeTagsMode ()) {
+		else if (!tagMetadataItems && privateSettings.GetAppendApeTagsMode ()) {
 			privateSettings.SetAppendApeTagsMode (0);		// 0 = tags not present
 			audioFormat.SetPrivateFormatData(privateSettings.GetSerialized().c_str());
 			isGivenFormatOK = false;
 		}
+
+		if (privateSettings.GetAppendApeTagsMode() == 1)
+			estimatedSize += tagMetadataSize;
 
 		inSettingsInfo.SetEstimatedFileSize(estimatedSize);
 		// audioFormat.SetMimeType("audio/x-ape");	// Since these files will probably most often be used in their decompressed form, 
@@ -593,7 +601,6 @@ protected:
 
 		audioFormat.SetFileFlags(fileFlags);
 
-		asdk::int32 mode = privateSettings.GetCompressionMode ();
 		char desc_str [256];
 
 		sprintf (desc_str, "WavPack %s\n%s Mode\n", sampleDepth,
@@ -602,8 +609,8 @@ protected:
 		if (mode % 10)
 			sprintf (desc_str + strlen (desc_str), "Extra Processing Level %d\n", mode % 10);
 
-		if (tag_metadata_items)
-			sprintf (desc_str + strlen (desc_str), "Append %d Tag Items: %s\n", tag_metadata_items, privateSettings.GetAppendApeTagsMode() & 1 ? "yes" : "no");
+		if (tagMetadataItems)
+			sprintf (desc_str + strlen (desc_str), "Append %d Tag Items: %s\n", tagMetadataItems, privateSettings.GetAppendApeTagsMode() & 1 ? "yes" : "no");
 
 		if ((mode % 1000) - (mode % 100))
 			sprintf (desc_str + strlen (desc_str), "%d kbps\n", privateSettings.GetCurrentBitrate());

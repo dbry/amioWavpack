@@ -153,18 +153,48 @@ namespace amio
 	}
 
 	///
-	double AmioWavpackPrivateSettings::GetEstimatedCompressionFactor() const
+	double AmioWavpackPrivateSettings::GetEstimatedCompressionBitsPerSample(AudioSampleType inType) const
 	{
-		const double conservativeAdjustment = 1.125;
+		// if hybrid lossy mode, just use hybrid bitrate setting plus 10% margin
+		if (((mCompressionMode % 1000) - (mCompressionMode % 100)) &&
+			!((mCompressionMode % 100) - (mCompressionMode % 10)))
+				return mHybridBitsPerSample * 1.1;
 
-		switch (GetCompressionMode() / 1000)
+		// otherwise we start with bits/sample based on input sample size, fast mode (worse case)
+		double bitsPerSample;
+
+		switch (inType)
 		{
-		case 1:			return 0.569 * conservativeAdjustment;
-		default:							
-		case 2:			return 0.545 * conservativeAdjustment;
-		case 3:			return 0.536 * conservativeAdjustment;
-		case 4:			return 0.527 * conservativeAdjustment;
+		case kAudioSampleType_UInt8:
+			bitsPerSample = 3.0;
+			break;
+		default:				// should not happen because we handle them all...
+		case kAudioSampleType_SInt16:
+			bitsPerSample = 9.0;
+			break;
+		case kAudioSampleType_SInt24:
+			bitsPerSample = 17.0;
+			break;
+		case kAudioSampleType_Float32:
+			bitsPerSample = 21.0;
+			break;
 		}
+
+		// now we adjust for higher compression levels & extra processing
+		if (mCompressionMode / 1000 == 1)
+			bitsPerSample -= (mCompressionMode % 10) * 0.04;		// "fast" mode
+		else if (mCompressionMode / 1000 == 2)
+			bitsPerSample -= 0.3 + (mCompressionMode % 10) * 0.03;	// "normal" mode
+		else if (mCompressionMode / 1000 == 3)
+			bitsPerSample -= 0.5 + (mCompressionMode % 10) * 0.02;	// "high" mode
+		else if (mCompressionMode / 1000 == 4)
+			bitsPerSample -= 0.6 + (mCompressionMode % 10) * 0.01;	// "very high" mode
+
+		// hybrid lossless mode costs a little too...
+		if ((mCompressionMode % 1000) - (mCompressionMode % 100))
+			bitsPerSample += 0.15;
+
+		return bitsPerSample;
 	}
 
 	///

@@ -43,7 +43,7 @@ namespace amio
 
 		int GetTotalSamplesPerSecond() const;
 
-		double GetEstimatedCompressionFactor() const;
+		double GetEstimatedCompressionBitsPerSample(AudioSampleType inType) const;
 
 		int GetMinimumBitrate() const;
 
