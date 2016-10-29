@@ -316,6 +316,9 @@ protected:
 		// snap hybrid bitrate to a standard rate for this sample rate and number of channels
 		privateSettings.SetCurrentBitrate(privateSettings.nearestStandardBitrate(privateSettings.GetCurrentBitrate()));
 
+		if (inReadFile.GetTagMetadataItemCount())
+			privateSettings.SetAppendApeTagsMode(1);	// 1 = tags present and write enabled
+
 		inFormat.SetPrivateFormatData(privateSettings.GetSerialized().c_str());
 
 		char msg [256];
@@ -545,6 +548,7 @@ protected:
 		asdk::int64 totalInputBytes = audioFormat.GetSampleTotal() * bytesPerSample * audioFormat.GetChannelCount();
 		double sizeFactorGuess = privateSettings.GetEstimatedCompressionFactor();
 		asdk::int64 estimatedSize = static_cast<asdk::int64>(sizeFactorGuess * totalInputBytes);
+		int tag_metadata_items = 0;
 
 		// When estimating the size, take into consideration the metadata.
 		for(asdk::int32 metadataIndex = 0; metadataIndex < audioFormat.GetMetadataItemCount(); metadataIndex++)
@@ -556,7 +560,22 @@ protected:
 			if (audioFormat.GetMetadataItemInfo(metadataIndex, metadataTypeID, metadataSize, locationHint))
 			{
 				estimatedSize += metadataSize;
+
+				if (!strnicmp(kAmioMetadataTypeID_BinaryTagMetadataChunk, metadataTypeID.c_str(), metadataTypeID.size()) ||
+					!strnicmp(kAmioMetadataTypeID_TextTagMetadataChunk, metadataTypeID.c_str(), metadataTypeID.size()))
+						tag_metadata_items++;
 			}
+		}
+
+		if (tag_metadata_items && !privateSettings.GetAppendApeTagsMode ()) {
+			privateSettings.SetAppendApeTagsMode (1);		// 1 = tags present and write enabled
+			audioFormat.SetPrivateFormatData(privateSettings.GetSerialized().c_str());
+			isGivenFormatOK = false;
+		}
+		else if (!tag_metadata_items && privateSettings.GetAppendApeTagsMode ()) {
+			privateSettings.SetAppendApeTagsMode (0);		// 0 = tags not present
+			audioFormat.SetPrivateFormatData(privateSettings.GetSerialized().c_str());
+			isGivenFormatOK = false;
 		}
 
 		inSettingsInfo.SetEstimatedFileSize(estimatedSize);
@@ -582,6 +601,9 @@ protected:
 
 		if (mode % 10)
 			sprintf (desc_str + strlen (desc_str), "Extra Processing Level %d\n", mode % 10);
+
+		if (tag_metadata_items)
+			sprintf (desc_str + strlen (desc_str), "Append %d Tag Items: %s\n", tag_metadata_items, privateSettings.GetAppendApeTagsMode() & 1 ? "yes" : "no");
 
 		if ((mode % 1000) - (mode % 100))
 			sprintf (desc_str + strlen (desc_str), "%d kbps\n", privateSettings.GetCurrentBitrate());
@@ -843,6 +865,9 @@ protected:
 	///
 	virtual AmioResult FinishWrite(WavpackWriter& inWriteFile, bool inIsCancel, const AmioFormatInterface& inFormat)
 	{
+		AmioWavpackPrivateSettings privateSettings;
+		amio::UTF16String privateSettingsString(inFormat.GetPrivateFormatData());
+		privateSettings.InitializeFromSerialized(privateSettingsString);
 		asdk::int32 result = kAmioInterfaceReturnCode_Success;
 
 		if (!inWriteFile.FlushWrite())
@@ -914,7 +939,7 @@ protected:
 						result = kAmioInterfaceReturnCode_GeneralError;
 				}
 
-				if (isTextTag || isBinaryTag) {
+				if ((isTextTag || isBinaryTag) && privateSettings.GetAppendApeTagsMode () == 1) {
 					if (!inWriteFile.AddTagMetadata (metadataBuffer, (int) metadataSize, isBinaryTag))
 						result = kAmioInterfaceReturnCode_GeneralError;
 				}

@@ -16,14 +16,9 @@
 #define IDC_BITRATE                     1010
 #define IDC_BITRATE_TEXT                1011
 #define IDC_CORRECTION                  1012
-#define IDC_FLOAT_GROUP                 1013
-#define IDC_FLOAT20                     1014
-#define IDC_FLOAT24                     1015
-#define IDC_FLOAT32                     1016
-#define IDC_NORMALIZE                   1017
-#define IDC_NOISESHAPE                  1023
-#define IDC_DITHER                      1024
+#define IDC_WRITETAGS                   1013
 #define IDC_EXTRA_GROUP                 1025
+#define IDC_META_GROUP                  1026
 #define IDC_EXTRA_SLIDER                1027
 
 // Next default values for new objects

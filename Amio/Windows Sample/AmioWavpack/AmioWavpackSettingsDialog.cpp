@@ -76,13 +76,6 @@ namespace
             EnableWindow (GetDlgItem (hDlg, IDC_BITRATE_TEXT), hybrid_mode);
             EnableWindow (GetDlgItem (hDlg, IDC_CORRECTION), hybrid_mode);
 
-            EnableWindow (GetDlgItem (hDlg, IDC_FLOAT20), FALSE);
-            EnableWindow (GetDlgItem (hDlg, IDC_FLOAT24), FALSE);
-            EnableWindow (GetDlgItem (hDlg, IDC_FLOAT32), FALSE);
-            EnableWindow (GetDlgItem (hDlg, IDC_NOISESHAPE), FALSE);
-            EnableWindow (GetDlgItem (hDlg, IDC_DITHER), FALSE);
-            EnableWindow (GetDlgItem (hDlg, IDC_NORMALIZE), FALSE);
-
 			int radioToCheck = IDC_LOSSLESS;
 			switch (mode / 1000)
 			{
@@ -119,6 +112,9 @@ namespace
 
             sprintf (str, "%d", mSettings.GetCurrentBitrate());
             SetDlgItemTextA (hDlg, IDC_BITRATE, str);
+
+            EnableWindow (GetDlgItem (hDlg, IDC_WRITETAGS), mSettings.GetAppendApeTagsMode());
+            CheckDlgButton (hDlg, IDC_WRITETAGS, mSettings.GetAppendApeTagsMode() & 1);
 
             SetFocus (GetDlgItem (hDlg, radioToCheck));
 			return TRUE;
@@ -185,6 +181,9 @@ namespace
 
                     if (new_br && new_br != mSettings.GetCurrentBitrate() && new_br <= 9999)
 						mSettings.SetCurrentBitrate (new_br < mSettings.GetMinimumBitrate() ? mSettings.GetMinimumBitrate() : new_br);
+
+					if (mSettings.GetAppendApeTagsMode())
+						mSettings.SetAppendApeTagsMode (IsDlgButtonChecked(hDlg, IDC_WRITETAGS) ? 1 : 2);
 
 					EndDialog(hDlg, item);
 					return TRUE;

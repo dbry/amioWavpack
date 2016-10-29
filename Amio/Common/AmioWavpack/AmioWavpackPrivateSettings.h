@@ -31,6 +31,10 @@ namespace amio
 
 		amio::UTF16String GetCompressionModeString() const;	// A human-readable expression of the mode.
 
+		void SetAppendApeTagsMode(int inMode);
+
+		int GetAppendApeTagsMode() const;
+
 		void SetHybridBitsPerSample(double inBitsPerSample);
 
 		double GetHybridBitsPerSample() const;
@@ -69,6 +73,7 @@ namespace amio
 		int						mCompressionMode;
 		double					mHybridBitsPerSample;
 		int						mTotalSamplesPerSecond;
+		int						mAppendApeTagsMode;
 	};
 } // namespace amio
 

@@ -20,6 +20,7 @@ namespace
 {
 	const amio::UTF16String kAttributeKey_CompressionMode = amio::utils::AsciiToUTF16("CompressionMode");
 	const amio::UTF16String kAttributeKey_HybridBitsPerSample = amio::utils::AsciiToUTF16("HybridBitsPerSample");
+	const amio::UTF16String kAttributeKey_AppendApeTagsMode = amio::utils::AsciiToUTF16("AppendApeTagsMode");
 
 } // private namespace
 
@@ -36,6 +37,7 @@ namespace amio
 	{
 		mCompressionMode = 2000;		// "normal" lossless compression
 		mHybridBitsPerSample = 3.8;		// 3.8 bits/sample
+		mAppendApeTagsMode = 0;			// default is no APE tags present
 	}
 
 	///
@@ -56,6 +58,18 @@ namespace amio
 	int AmioWavpackPrivateSettings::GetCompressionMode() const
 	{
 		return mCompressionMode;
+	}
+
+	///
+	void AmioWavpackPrivateSettings::SetAppendApeTagsMode(int inMode)
+	{
+		mAppendApeTagsMode = inMode;
+	}
+
+	///
+	int AmioWavpackPrivateSettings::GetAppendApeTagsMode() const
+	{
+		return mAppendApeTagsMode;
 	}
 
 	///
@@ -161,6 +175,8 @@ namespace amio
 		serializer.AddAttribute(kAttributeKey_CompressionMode, static_cast<asdk::int32>(GetCompressionMode()));
 		if ((mCompressionMode % 1000) - (mCompressionMode % 100))
 			serializer.AddAttribute(kAttributeKey_HybridBitsPerSample, static_cast<asdk::int32>(GetHybridBitsPerSample() * 1000.0 + 0.5));
+		if (GetAppendApeTagsMode())
+			serializer.AddAttribute(kAttributeKey_AppendApeTagsMode, static_cast<asdk::int32>(GetAppendApeTagsMode()));
 		amio::UTF16String ret = serializer.GetSerializedString();
 		return ret;
 	}
@@ -181,6 +197,10 @@ namespace amio
 		    serializer.QueryAttribute(kAttributeKey_HybridBitsPerSample, iValue))
 		{
 			SetHybridBitsPerSample(iValue / 1000.0);
+		}
+		if (serializer.QueryAttribute(kAttributeKey_AppendApeTagsMode, iValue))
+		{
+			SetAppendApeTagsMode(iValue);
 		}
 		return true;
 	}
