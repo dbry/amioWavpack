@@ -82,14 +82,14 @@ namespace amio
 	void AmioWavpackPrivateSettings::SetHybridBitsPerSample(double inBitsPerSample)
 	{
 		if (inBitsPerSample != 0.0)
-			mHybridBitsPerSample = inBitsPerSample;
+			mHybridBitsPerSample = inBitsPerSample >= 2.22 ? inBitsPerSample : 2.22;
 	}
 
 	///
 	void AmioWavpackPrivateSettings::SetCurrentBitrate(int inBitrate)
 	{
-		if (inBitrate)
-			mHybridBitsPerSample = inBitrate * 1000.0 / mTotalSamplesPerSecond;
+		if (inBitrate && mTotalSamplesPerSecond)
+			SetHybridBitsPerSample (inBitrate * 1000.0 / mTotalSamplesPerSecond);
 	}
 
 	///

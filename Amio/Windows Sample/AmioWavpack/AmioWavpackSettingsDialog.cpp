@@ -100,7 +100,7 @@ namespace
             SendDlgItemMessage (hDlg, IDC_EXTRA_SLIDER, TBM_SETRANGE, 0, MAKELONG (0, 6));
             SendDlgItemMessage (hDlg, IDC_EXTRA_SLIDER, TBM_SETPOS, 1, mode % 10);
 
-            SendDlgItemMessage (hDlg, IDC_BITRATE, CB_LIMITTEXT, 4, 0);
+            SendDlgItemMessage (hDlg, IDC_BITRATE, CB_LIMITTEXT, 5, 0);
 
 			char str [16];
 			int br_max = mSettings.GetMaximumBitrate();
@@ -179,10 +179,10 @@ namespace
                     GetWindowTextA (GetDlgItem (hDlg, IDC_BITRATE), str, sizeof (str));
 					int new_br = atol (str);
 
-                    if (new_br && new_br != mSettings.GetCurrentBitrate() && new_br <= 9999)
+                    if (new_br && new_br != mSettings.GetCurrentBitrate() && new_br <= 99999)
 						mSettings.SetCurrentBitrate (new_br < mSettings.GetMinimumBitrate() ? mSettings.GetMinimumBitrate() : new_br);
 
-					if (mSettings.GetAppendApeTagsMode())
+					if (mSettings.GetAppendApeTagsMode())		// don't change this setting unless there are tags
 						mSettings.SetAppendApeTagsMode (IsDlgButtonChecked(hDlg, IDC_WRITETAGS) ? 1 : 2);
 
 					EndDialog(hDlg, item);
