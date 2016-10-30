@@ -64,6 +64,9 @@ namespace amio
 		asdk::int32 GetBytesPerSample() const;
 
 		///
+		asdk::int32 GetFileVersion() const;
+
+		///
 		/// Reading Samples
 		///
 		

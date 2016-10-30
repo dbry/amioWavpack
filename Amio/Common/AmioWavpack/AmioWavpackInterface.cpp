@@ -235,6 +235,13 @@ protected:
 		AmioWavpackPrivateSettings privateSettings;
 		privateSettings.SetCompressionMode(reader->GetCompressionMode());
 
+		if (reader->GetFileVersion() < 4)
+			MessageBoxA (NULL,
+				"This legacy file is deprecated and its use is not recommended.\n"
+				"Future versions of this plugin may not read this file. Use this\n"
+				"plugin or the WavPack 4.80 command-line program to\n"
+				"transcode files of this vintage to a more recent version.", "WavPack Legacy Notification", MB_OK);
+
 		asdk::int32 bitRate = reader->GetBitRate();
 		char asciiFormat[256];
 		sprintf(asciiFormat,"WavPack %s Mode %ld kbps",
@@ -249,7 +256,7 @@ protected:
 		amioOpen.SetAudioFormatDescriptionString(formatDescription.c_str()); 
 		amioOpen.SetAudioBitrate(bitRate);
 
-        if (reader->GetNumChannels() <= 8)
+        if (reader->GetNumChannels() <= 8 && reader->GetFileVersion() >= 4)
             amioOpen.SetFileFlags(kAmioFileFlag_XmpSupportThroughPluginOnly |
                                   kAmioFileFlag_ReadSamplesRaw |
                                   kAmioFileFlag_RealTimeSupport);

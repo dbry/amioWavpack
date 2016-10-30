@@ -314,6 +314,12 @@ namespace amio
 		}
 
 		///
+		asdk::int32 GetFileVersion() const
+		{
+			return WavpackGetVersion(wpcx);
+		}
+
+		///
 		bool ReadSamples(asdk::int64 inStartSample, asdk::int32 inSampleCount, asdk::int32 inChannelIndex, void *inBuffer)
 		{
 			// If the entire requested portion is not in our buffer, reallocate and decode
@@ -669,6 +675,12 @@ namespace amio
 	asdk::int32 WavpackReader::GetBytesPerSample() const
 	{
 		return mImpl->mBytesPerSample;
+	}
+
+	///
+	asdk::int32 WavpackReader::GetFileVersion() const
+	{
+		return mImpl->GetFileVersion();
 	}
 
 	/// Get deinterleaved samples for the zero-based inChannelIndex.
