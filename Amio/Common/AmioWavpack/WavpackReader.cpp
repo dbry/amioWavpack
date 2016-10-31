@@ -272,6 +272,7 @@ namespace amio
 						memcpy (data, item, item_len + 1);
 						WavpackGetTagItem (wpcx, item, (char *) data + item_len + 1, value_len + 1);
 						mTagMetadataItems.push_back(TagMetadataItem (data, item_len + 1 + value_len, false));
+						mMetadataSize += item_len + value_len;
 					}
 
 					delete item;
@@ -288,6 +289,7 @@ namespace amio
 						memcpy (data, item, item_len + 1);
 						WavpackGetBinaryTagItem (wpcx, item, (char *) data + item_len + 1, value_len);
 						mTagMetadataItems.push_back(TagMetadataItem (data, item_len + 1 + value_len, true));
+						mMetadataSize += item_len + value_len;
 					}
 
 					delete item;
@@ -518,11 +520,20 @@ namespace amio
 			return static_cast<int>(WavpackGetAverageBitrate (wpcx, 1));
 		}
 
-		///
+		/// We calculate this ourselves because the WavPack library API
+		/// can't take the metadata into account
 		double GetHybridBitsPerSample() const
 		{
 			if (mMode & MODE_HYBRID)
-				return WavpackGetAverageBitrate (wpcx, 0) / mChannels / mSampleRate;
+			{
+				double file_size = (double) WavpackGetFileSize64 (wpcx);
+				// adjust file size to get size of main file only (because there's no API to get that directly)
+				file_size *= WavpackGetAverageBitrate (wpcx, false);
+				file_size /= WavpackGetAverageBitrate (wpcx, true);
+				// now adjust for metadata so we don't count that in hybrid bitrate
+				if (file_size > mMetadataSize) file_size -= mMetadataSize;
+				return file_size * 8.0 / mSampleCount / mChannels;
+			}
 			else
 				return 0.0;
 		}
