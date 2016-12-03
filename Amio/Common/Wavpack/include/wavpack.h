@@ -210,6 +210,7 @@ typedef struct {
 #define CONFIG_CREATE_EXE       0x40000 // create executable
 #define CONFIG_CREATE_WVC       0x80000 // create correction file
 #define CONFIG_OPTIMIZE_WVC     0x100000 // maximize bybrid compression
+#define CONFIG_COMPATIBLE_WRITE 0x400000 // write files for decoders < 4.3
 #define CONFIG_CALC_NOISE       0x800000 // calc noise in hybrid mode
 #define CONFIG_EXTRA_MODE       0x2000000 // extra processing mode
 #define CONFIG_SKIP_WVX         0x4000000 // no wvx stream w/ floats & big ints
@@ -287,6 +288,11 @@ extern "C" {
 
 #define MAX_WAVPACK_SAMPLES ((1LL << 40) - 257)
 
+WavpackContext *WavpackOpenRawDecoder (
+    void *main_data, int32_t main_size,
+    void *corr_data, int32_t corr_size,
+    int16_t version, char *error, int flags, int norm_offset);
+
 WavpackContext *WavpackOpenFileInputEx64 (WavpackStreamReader64 *reader, void *wv_id, void *wvc_id, char *error, int flags, int norm_offset);
 WavpackContext *WavpackOpenFileInputEx (WavpackStreamReader *reader, void *wv_id, void *wvc_id, char *error, int flags, int norm_offset);
 WavpackContext *WavpackOpenFileInput (const char *infilename, char *error, int flags, int norm_offset);
@@ -308,6 +314,7 @@ WavpackContext *WavpackOpenFileInput (const char *infilename, char *error, int f
 #define OPEN_DSD_AS_PCM 0x200   // open DSD files as 24-bit PCM (decimated 8x)
 #define OPEN_ALT_TYPES  0x400   // application is aware of alternate file types & qmode
                                 // (just affects retrieving wrappers & MD5 checksums)
+#define OPEN_NO_CHECKSUM 0x800  // don't verify block checksums before decoding
 
 int WavpackGetMode (WavpackContext *wpc);
 
@@ -326,7 +333,7 @@ int WavpackGetMode (WavpackContext *wpc);
 #define MODE_XMODE      0x7000  // mask for extra level (1-6, 0=unknown)
 #define MODE_DNS        0x8000
 
-int WavpackVerifySingleBlock (unsigned char *buffer);
+int WavpackVerifySingleBlock (unsigned char *buffer, int verify_checksum);
 int WavpackGetQualifyMode (WavpackContext *wpc);
 char *WavpackGetErrorMessage (WavpackContext *wpc);
 int WavpackGetVersion (WavpackContext *wpc);
@@ -335,6 +342,7 @@ unsigned char WavpackGetFileFormat (WavpackContext *wpc);
 uint32_t WavpackUnpackSamples (WavpackContext *wpc, int32_t *buffer, uint32_t samples);
 uint32_t WavpackGetNumSamples (WavpackContext *wpc);
 int64_t WavpackGetNumSamples64 (WavpackContext *wpc);
+uint32_t WavpackGetNumSamplesInFrame (WavpackContext *wpc);
 uint32_t WavpackGetSampleIndex (WavpackContext *wpc);
 int64_t WavpackGetSampleIndex64 (WavpackContext *wpc);
 int WavpackGetNumErrors (WavpackContext *wpc);
