@@ -197,7 +197,7 @@ namespace
 			case IDABOUT:
 				if (cmd == BN_CLICKED)
 				{
-					amio::UTF16String about(L"AmioWavpack Plugin Version 2.0a\nWavPack Library Version ");
+					amio::UTF16String about(L"AmioWavpack Plugin Version 2.0\nWavPack Library Version ");
 					about += mSettings.GetWavpackLibraryVersion();
 					about += L"\nCopyright (c) 2016 David Bryant";
 					MessageBox (hDlg, about.c_str(), L"About AmioWavpack Plugin", MB_OK);

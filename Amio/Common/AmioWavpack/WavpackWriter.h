@@ -35,6 +35,21 @@ namespace amio
 		};
 
 		// Initialize a representation of a file for writing.
+
+        // Meaning of the 4-digit "CompressionMode" value that we use in several places,
+        // including as a parameter here. Value is decimal "sum" with these fields:
+
+        // 1000 = "fast" mode
+        // 2000 = "normal/default" mode
+        // 3000 = "high" mode
+        // 4000 = "very high" mode
+        //  100 = hybrid mode (either lossless or lossy)
+        //   10 = wvc mode (makes hybrid into lossless)
+        //    n = "extra" mode level 0-6
+
+        // Note that the "extra" mode value is used here, but we do not read it from input files
+        // (even though the info is available) because we want to user to set explicitly each time
+
 		bool Initialize(const amio::UTF16String& inFileName, 
 			asdk::int32 inSampleRate,
 			asdk::int32 inNumChannels,

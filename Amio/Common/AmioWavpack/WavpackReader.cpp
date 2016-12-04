@@ -524,7 +524,7 @@ namespace amio
 		/// can't take the metadata into account
 		double GetHybridBitsPerSample() const
 		{
-			if (mMode & MODE_HYBRID)
+			if ((mMode & MODE_HYBRID) || !(mMode & MODE_LOSSLESS))
 			{
 				double file_size = (double) WavpackGetFileSize64 (wpcx);
 				// adjust file size to get size of main file only (because there's no API to get that directly)
@@ -672,7 +672,10 @@ namespace amio
         else if (mImpl->mMode & MODE_HIGH)
             ret_value = 3000;
 
-		if (mImpl->mMode & MODE_HYBRID) {
+		// very old WavPack files could be lossy before hybrid existed,
+		// but we'll call them "hybrid lossy" in this context
+
+		if ((mImpl->mMode & MODE_HYBRID) || !(mImpl->mMode & MODE_LOSSLESS)) {
 			ret_value += 100;
 
 			if (mImpl->mMode & MODE_LOSSLESS)
