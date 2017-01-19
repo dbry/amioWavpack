@@ -19,15 +19,11 @@ SDK available to me early on and for incorporating some of my suggestions.
 
 * Support for all Audition audio formats, including the native 32-bit float format
 * Support of all the Audition metadata allowed with WAV files (cues, markers, etc.)
-* Support for the Audition maximum channel count (32)
-* Fast operation
-
-## Coming soon...
-
+* Support for the Audition maximum channel count (32) and all amio channel identities
 * Support for "realtime" mode so you don't have to wait for a file scan every load
 * Retention of all APEv2 tag information when editing existing WavPack files
 * Support for the Audition maximum file size (no more 2 GB limit)
-* Support for all amio channel identities
+* Fast operation
 
 ## Building
 
