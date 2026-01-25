@@ -334,7 +334,7 @@ namespace amio
 				}
 				if (inStartSample != mExpectedSeekPosition)
 				{
-					WavpackSeekSample (wpcx, static_cast<int>(static_cast<asdk::uint32>(inStartSample)));
+					WavpackSeekSample64 (wpcx, inStartSample);
 				}
 
 				int blocksRead = WavpackUnpackSamples (wpcx, reinterpret_cast<int32_t*>(mInterleavedBuffer.get ()), inSampleCount);
@@ -429,9 +429,9 @@ namespace amio
 				}
 				if (inStartSample != mExpectedSeekPosition)
 				{
-                    // OutputDebugStringA ("**** WavpackReader::ReadSamplesRaw(): calling WavpackSeekSample() ****\n");
-					if (!WavpackSeekSample (wpcx, static_cast<int>(static_cast<asdk::uint32>(inStartSample))))
-                        OutputDebugStringA ("**** WavpackReader::ReadSamplesRaw(): WavpackSeekSample() failed!! ****\n");
+                    // OutputDebugStringA ("**** WavpackReader::ReadSamplesRaw(): calling WavpackSeekSample64() ****\n");
+					if (!WavpackSeekSample64 (wpcx, inStartSample))
+                        OutputDebugStringA ("**** WavpackReader::ReadSamplesRaw(): WavpackSeekSample64() failed!! ****\n");
 				}
 
 				int blocksRead = WavpackUnpackSamples (wpcx, reinterpret_cast<int32_t*>(mInterleavedBuffer.get ()),
