@@ -23,6 +23,7 @@
 #include "WavpackWriter.h"
 
 #include <string>
+#include <memory>
 
 #ifdef AMIO_OS_MAC
 #define strnicmp strncasecmp
@@ -924,7 +925,7 @@ protected:
 				{
 					char msg [256];
 
-					sprintf (msg, "FinishWrite: unknown ID %s, %d bytes, skipping\n", metadataTypeID.c_str(), metadataSize);
+					sprintf (msg, "FinishWrite: unknown ID %s, %d bytes, skipping\n", metadataTypeID.c_str(), static_cast<int>(metadataSize));
 					OutputDebugStringA (msg);
 					continue;
 				}

@@ -107,7 +107,7 @@ namespace
             for (int i = mSettings.nearestStandardBitrate(mSettings.GetMinimumBitrate()); i <= br_max; ++i)
                 if (mSettings.isStandardBitrate (i)) {
                     sprintf (str, "%d", i);
-                    SendDlgItemMessageA (hDlg, IDC_BITRATE, CB_ADDSTRING, 0, (long) str);
+                    SendDlgItemMessageA (hDlg, IDC_BITRATE, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(str));
                 }
 
             sprintf (str, "%d", mSettings.GetCurrentBitrate());

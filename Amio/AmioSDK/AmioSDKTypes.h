@@ -40,6 +40,7 @@
 #endif
 
 #include <vector>
+#include <string>
 
 namespace amio
 {
